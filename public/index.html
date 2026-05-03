@@ -221,95 +221,6 @@
   .footer-bottom-links a { font-size: 12px; color: var(--gray); text-decoration: none; cursor: pointer; transition: color 0.2s; }
   .footer-bottom-links a:hover { color: var(--white); }
 
-  /* ===== RESPONSIVE / MOBILE ===== */
-  @media (max-width: 768px) {
-    /* NAV */
-    nav { padding: 0 16px; position: relative; flex-wrap: wrap; height: auto; min-height: 60px; }
-    .nav-logo { font-size: 20px; padding: 12px 0; }
-    .nav-mobile-toggle { display: flex; align-items: center; justify-content: center; margin-left: auto; padding: 12px 0; }
-    .nav-cart { padding: 7px 14px; font-size: 13px; }
-    .nav-links { display: none; width: 100%; flex-direction: column; gap: 0; background: var(--dark); border-top: 1px solid var(--steel); padding: 8px 0; order: 3; }
-    .nav-links.mobile-open { display: flex; }
-    .nav-links a { padding: 12px 16px; font-size: 15px; border-radius: 0; }
-
-    /* HERO */
-    .hero { height: auto; padding: 48px 20px 40px; }
-    .hero-title { font-size: 56px; }
-    .hero-sub { font-size: 14px; }
-    .hero-cta { flex-direction: column; gap: 10px; }
-    .btn-primary, .btn-outline { width: 100%; text-align: center; }
-
-    /* STATS BAR */
-    .stats-bar { padding: 16px 20px; gap: 20px; flex-wrap: wrap; }
-    .stat-num { font-size: 22px; }
-
-    /* SECTIONS */
-    .section { padding: 40px 16px; }
-    .section-header { flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 24px; }
-    .section-title { font-size: 36px; }
-    .search-input { width: 100%; }
-    .section-divider { margin: 40px 16px; }
-
-    /* PRODUCT GRID */
-    .product-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
-    .product-img-wrap { height: 160px; }
-    .product-img-emoji { font-size: 44px; }
-    .product-name { font-size: 14px; }
-    .product-price { font-size: 20px; }
-
-    /* FILTER BAR */
-    .filter-bar { gap: 6px; }
-    .filter-btn { padding: 6px 14px; font-size: 12px; }
-
-    /* CART PANEL */
-    .cart-panel { width: 100%; }
-
-    /* ADMIN */
-    .admin-panel { grid-template-columns: 1fr; }
-    .admin-sidebar { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; padding: 8px 0; border-right: none; border-bottom: 1px solid var(--steel); overflow-x: auto; }
-    .admin-sidebar-title { display: none; }
-    .sidebar-item { border-left: none; border-bottom: 3px solid transparent; padding: 10px 14px; white-space: nowrap; font-size: 13px; }
-    .sidebar-item.active { border-left-color: transparent; border-bottom-color: var(--red); }
-    .admin-content { padding: 20px 16px; }
-    .admin-stats { grid-template-columns: 1fr 1fr; gap: 10px; }
-    .admin-topbar { flex-direction: column; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
-    .admin-topbar h1 { font-size: 28px; }
-    .admin-table-header { flex-direction: column; align-items: flex-start; gap: 10px; }
-    .admin-table-header .search-input { width: 100%; }
-
-    /* TABLE — make scrollable on mobile */
-    .admin-table-wrap { overflow-x: auto; }
-    table { min-width: 480px; }
-
-    /* MODAL */
-    .modal { width: 95vw; padding: 20px; }
-    .modal h3 { font-size: 22px; }
-
-    /* CHECKOUT */
-    .checkout-page { padding: 32px 16px; }
-
-    /* FOOTER */
-    .site-footer { padding: 40px 16px 24px; }
-    .footer-grid { grid-template-columns: 1fr; gap: 28px; }
-    .footer-bottom { flex-direction: column; align-items: flex-start; gap: 8px; }
-    .footer-bottom-links { gap: 16px; flex-wrap: wrap; }
-
-    /* COOKIE */
-    .cookie-banner { padding: 16px; flex-direction: column; gap: 12px; }
-    .cookie-banner-btns { width: 100%; justify-content: flex-end; }
-
-    /* LEGAL */
-    .legal-page { padding: 40px 16px; }
-    .legal-page h1 { font-size: 40px; }
-  }
-
-  @media (max-width: 480px) {
-    .hero-title { font-size: 44px; }
-    .product-grid { grid-template-columns: 1fr 1fr; }
-    .admin-stats { grid-template-columns: 1fr 1fr; }
-    .stats-bar { justify-content: space-between; }
-  }
-
   /* COOKIE BANNER */
   .cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; background: var(--dark); border-top: 1px solid var(--steel); padding: 20px 40px; display: flex; align-items: center; justify-content: space-between; gap: 24px; z-index: 1000; flex-wrap: wrap; transform: translateY(100%); transition: transform 0.4s ease; }
   .cookie-banner.show { transform: translateY(0); }
@@ -320,35 +231,6 @@
   .cookie-accept:hover { background: var(--red-dark); }
   .cookie-decline { background: transparent; color: var(--gray); border: 1px solid var(--steel); padding: 10px 24px; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
   .cookie-decline:hover { border-color: var(--white); color: var(--white); }
-
-  /* PHOTO UPLOAD */
-  .photo-upload-area { border: 2px dashed var(--steel); border-radius: 8px; padding: 20px; text-align: center; cursor: pointer; transition: border-color 0.2s; margin-top: 8px; }
-  .photo-upload-area:hover { border-color: var(--red); }
-  .photo-upload-area input[type=file] { display: none; }
-  .photo-upload-label { font-size: 13px; color: var(--gray); }
-  .photo-upload-label span { color: var(--red); font-weight: 600; cursor: pointer; }
-  .photo-previews { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-  .photo-thumb { position: relative; width: 72px; height: 72px; border-radius: 6px; overflow: hidden; border: 2px solid var(--steel); flex-shrink: 0; }
-  .photo-thumb img { width: 100%; height: 100%; object-fit: cover; }
-  .photo-thumb-remove { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.75); color: #fff; border: none; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
-  .photo-count-label { font-size: 11px; color: var(--gray); margin-top: 4px; }
-
-  /* PRODUCT IMAGE SLIDESHOW */
-  .product-img-wrap { position: relative; width: 100%; height: 200px; background: var(--mid); overflow: hidden; }
-  .product-img-slide { width: 100%; height: 100%; object-fit: cover; display: none; }
-  .product-img-slide.active { display: block; }
-  .product-img-emoji { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 60px; }
-  .slide-dots { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; }
-  .slide-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.4); cursor: pointer; border: none; padding: 0; transition: background 0.2s; }
-  .slide-dot.active { background: #fff; }
-  .slide-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: #fff; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 2; transition: background 0.2s; }
-  .slide-arrow:hover { background: rgba(0,0,0,0.8); }
-  .slide-arrow.prev { left: 6px; }
-  .slide-arrow.next { right: 6px; }
-
-  /* MOBILE NAV TOGGLE */
-  .nav-mobile-toggle { display: none; background: none; border: none; color: var(--white); font-size: 22px; cursor: pointer; padding: 4px; }
-  .nav-mobile-menu { display: none; }
 
   /* LEGAL PAGES */
   .legal-page { max-width: 800px; margin: 0 auto; padding: 72px 40px; }
@@ -361,53 +243,16 @@
   .legal-page a { color: var(--red); text-decoration: underline; }
   .legal-back { display: inline-flex; align-items: center; gap: 8px; color: var(--gray); font-size: 13px; cursor: pointer; margin-bottom: 40px; transition: color 0.2s; background: none; border: none; }
   .legal-back:hover { color: var(--white); }
-
-  /* PRODUCT DETAIL PAGE */
-  .pdp-wrap { max-width: 1100px; margin: 0 auto; padding: 48px 40px; }
-  .pdp-back { display: inline-flex; align-items: center; gap: 8px; color: var(--gray); font-size: 13px; cursor: pointer; margin-bottom: 36px; transition: color 0.2s; background: none; border: none; font-family: 'DM Sans', sans-serif; }
-  .pdp-back:hover { color: var(--white); }
-  .pdp-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
-  .pdp-gallery { display: flex; flex-direction: column; gap: 12px; }
-  .pdp-main-img { width: 100%; aspect-ratio: 4/3; border-radius: 10px; overflow: hidden; background: var(--mid); position: relative; }
-  .pdp-main-img img { width: 100%; height: 100%; object-fit: cover; display: none; }
-  .pdp-main-img img.active { display: block; }
-  .pdp-main-emoji { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 100px; }
-  .pdp-thumbs { display: flex; gap: 8px; flex-wrap: wrap; }
-  .pdp-thumb { width: 72px; height: 72px; border-radius: 6px; overflow: hidden; border: 2px solid var(--steel); cursor: pointer; flex-shrink: 0; transition: border-color 0.2s; background: var(--mid); display: flex; align-items: center; justify-content: center; font-size: 28px; }
-  .pdp-thumb img { width: 100%; height: 100%; object-fit: cover; }
-  .pdp-thumb.active { border-color: var(--red); }
-  .pdp-info { display: flex; flex-direction: column; }
-  .pdp-cat { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--red); font-weight: 600; margin-bottom: 10px; }
-  .pdp-name { font-family: 'Bebas Neue', sans-serif; font-size: 52px; line-height: 1; letter-spacing: 2px; margin-bottom: 16px; }
-  .pdp-price { font-family: 'Bebas Neue', sans-serif; font-size: 42px; color: var(--red); letter-spacing: 1px; margin-bottom: 20px; }
-  .pdp-stock-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; letter-spacing: 0.5px; padding: 5px 12px; border-radius: 4px; margin-bottom: 28px; width: fit-content; }
-  .pdp-stock-badge.in { background: rgba(99,173,84,0.12); color: #7fd171; }
-  .pdp-stock-badge.out { background: rgba(208,37,26,0.12); color: var(--red); }
-  .pdp-divider { height: 1px; background: var(--steel); margin: 20px 0; }
-  .pdp-desc { font-size: 15px; color: var(--gray); line-height: 1.75; margin-bottom: 32px; }
-  .pdp-add-btn { width: 100%; background: var(--red); color: #fff; border: none; padding: 16px 32px; font-size: 16px; font-weight: 700; border-radius: 6px; cursor: pointer; letter-spacing: 0.5px; transition: background 0.2s; margin-bottom: 12px; }
-  .pdp-add-btn:hover { background: var(--red-dark); }
-  .pdp-add-btn:disabled { background: var(--steel); cursor: not-allowed; color: var(--gray); }
-  .pdp-meta { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
-  .pdp-meta-row { display: flex; gap: 10px; font-size: 13px; color: var(--gray); }
-  .pdp-meta-row strong { color: var(--white); min-width: 80px; }
-  @media (max-width: 768px) {
-    .pdp-wrap { padding: 28px 16px; }
-    .pdp-layout { grid-template-columns: 1fr; gap: 32px; }
-    .pdp-name { font-size: 38px; }
-    .pdp-price { font-size: 32px; }
-  }
 </style>
 </head>
 <body>
 
 <nav>
   <div class="nav-logo" onclick="showPage('shop')">RARES <span>AUTO EXPORT</span></div>
-  <button class="nav-mobile-toggle" onclick="toggleMobileNav()" id="mobileNavToggle" aria-label="Menu">☰</button>
-  <div class="nav-links" id="navLinks">
-    <a onclick="showPage('shop');closeMobileNav()" id="nav-shop" class="active">Shop</a>
-    <a onclick="showPage('gallery');closeMobileNav()" id="nav-gallery">Gallery</a>
-    <a onclick="showPage('admin');closeMobileNav()" id="nav-admin">Admin</a>
+  <div class="nav-links">
+    <a onclick="showPage('shop')" id="nav-shop" class="active">Shop</a>
+    <a onclick="showPage('gallery')" id="nav-gallery">Gallery</a>
+    <a onclick="showPage('admin')" id="nav-admin">Admin</a>
   </div>
   <button class="nav-cart" onclick="toggleCart()">
     🛒 Cart <span class="cart-count" id="cartCount">0</span>
@@ -468,7 +313,7 @@
       <p>Rares Auto Export — Admin Panel</p>
       <div class="form-group">
         <label>Username</label>
-        <input type="text" id="adminUser" placeholder="username" />
+        <input type="text" id="adminUser" placeholder="admin" />
       </div>
       <div class="form-group">
         <label>Password</label>
@@ -476,6 +321,7 @@
       </div>
       <button class="btn-primary" style="width:100%;margin-top:8px" onclick="doLogin()">Login</button>
       <p style="font-size:12px;color:var(--gray);margin-top:16px;text-align:center">Default: admin / admin123</p>
+    </div>
   </div>
 
   <div id="adminDashboard" style="display:none">
@@ -765,30 +611,6 @@
   </div>
 </div>
 
-<!-- PRODUCT DETAIL PAGE -->
-<div id="productPage" class="page">
-  <div class="pdp-wrap">
-    <button class="pdp-back" onclick="showPage('gallery')">← Back to Gallery</button>
-    <div class="pdp-layout">
-      <!-- Photo gallery -->
-      <div class="pdp-gallery">
-        <div class="pdp-main-img" id="pdpMainImg"></div>
-        <div class="pdp-thumbs" id="pdpThumbs"></div>
-      </div>
-      <!-- Info -->
-      <div class="pdp-info">
-        <div class="pdp-cat" id="pdpCat"></div>
-        <div class="pdp-name" id="pdpName"></div>
-        <div class="pdp-price" id="pdpPrice"></div>
-        <div class="pdp-stock-badge" id="pdpStock"></div>
-        <div class="pdp-divider"></div>
-        <div class="pdp-desc" id="pdpDesc"></div>
-        <button class="pdp-add-btn" id="pdpAddBtn">Add to Cart</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- FOOTER -->
 <footer class="site-footer" id="siteFooter">
   <div class="footer-grid">
@@ -874,15 +696,6 @@
       <label>Icon</label>
       <div class="img-emoji-picker" id="emojiPicker"></div>
     </div>
-    <div class="form-group">
-      <label>Product Photos <span style="color:var(--gray);font-weight:400">(up to 5)</span></label>
-      <div class="photo-upload-area" onclick="document.getElementById('photoFileInput').click()">
-        <input type="file" id="photoFileInput" accept="image/*" multiple onchange="handlePhotoUpload(event)">
-        <div class="photo-upload-label">📷 <span>Click to upload photos</span> or drag & drop<br>JPG, PNG, WEBP — max 5 images</div>
-      </div>
-      <div class="photo-previews" id="photoPreviews"></div>
-      <div class="photo-count-label" id="photoCountLabel"></div>
-    </div>
     <div class="modal-footer">
       <button class="modal-footer btn-cancel" onclick="closeModal()">Cancel</button>
       <button class="modal-footer btn-save" onclick="saveProduct()">Save Product</button>
@@ -900,7 +713,6 @@ let products = JSON.parse(localStorage.getItem('acProducts') || '[]');
 let cart = [];
 let editId = null;
 let selectedEmoji = '🔧';
-let pendingPhotos = [];
 // UPDATE after deploying backend to Render.com
 // Example: 'https://raresautoexp-payments.onrender.com'
 let BACKEND_URL = localStorage.getItem('acBackendUrl') || '';
@@ -909,7 +721,7 @@ let currentAdminTab = 'dashboard';
 
 if (products.length === 0) {
   products = [
-    {id:1,name:'Bosch Brake Pads',cat:'Brakes',desc:'OEM-quality ceramic brake pads for superior stopping power.',price:49.99,emoji:'🛞',stock:'in',photos:['https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?w=600&q=80','https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80','https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=600&q=80','https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=600&q=80','https://images.unsplash.com/photo-1568844293986-8d0400bd4745?w=600&q=80']},
+    {id:1,name:'Bosch Brake Pads',cat:'Brakes',desc:'OEM-quality ceramic brake pads for superior stopping power.',price:49.99,emoji:'🛞',stock:'in'},
     {id:2,name:'K&N Air Filter',cat:'Filters',desc:'High-flow air filter that increases horsepower and acceleration.',price:34.99,emoji:'💨',stock:'in'},
     {id:3,name:'Monroe Shock Absorber',cat:'Suspension',desc:'Gas-charged shock absorbers for a smooth, controlled ride.',price:79.99,emoji:'🔩',stock:'in'},
     {id:4,name:'NGK Spark Plugs (4pk)',cat:'Engine',desc:'Iridium tip spark plugs for maximum fuel efficiency.',price:28.99,emoji:'🔥',stock:'in'},
@@ -928,12 +740,14 @@ function showPage(p) {
   const el = document.getElementById('nav-'+p);
   if(el) el.classList.add('active');
   if(p==='shop') renderProducts();
+
+// Show admin page when accessed via raresautoexp.com/admin
   if(p==='gallery') renderGallery();
   if(p==='admin') renderAdminTable();
   if(p==='checkout') renderCheckout();
-  // Hide footer on admin, checkout & product pages
+  // Hide footer on admin & checkout pages
   const footer = document.getElementById('siteFooter');
-  if(footer) footer.style.display = (p==='admin'||p==='checkout'||p==='product') ? 'none' : 'block';
+  if(footer) footer.style.display = (p==='admin'||p==='checkout') ? 'none' : 'block';
   window.scrollTo(0,0);
 }
 
@@ -950,33 +764,6 @@ function initCookieBanner() {
 }
 initCookieBanner();
 
-function makeProductImgHTML(p, heightStyle='') {
-  if(p.photos && p.photos.length > 0) {
-    const pid = p.id;
-    const dots = p.photos.length > 1 ? `<div class="slide-dots">${p.photos.map((_,i)=>`<button class="slide-dot${i===0?' active':''}" onclick="event.stopPropagation();slideTo(${pid},${i})"></button>`).join('')}</div>` : '';
-    const arrows = p.photos.length > 1 ? `<button class="slide-arrow prev" onclick="event.stopPropagation();slideDir(${pid},-1)">‹</button><button class="slide-arrow next" onclick="event.stopPropagation();slideDir(${pid},1)">›</button>` : '';
-    const imgs = p.photos.map((src,i)=>`<img class="product-img-slide${i===0?' active':''}" src="${src}" data-slide="${i}" alt="${p.name}">`).join('');
-    return `<div class="product-img-wrap"${heightStyle? ` style="${heightStyle}"`:''}>${imgs}${arrows}${dots}</div>`;
-  }
-  return `<div class="product-img-wrap"${heightStyle? ` style="${heightStyle}"`:''}><div class="product-img-emoji">${p.emoji||'🔧'}</div></div>`;
-}
-
-function slideTo(pid, idx) {
-  const card = document.querySelector(`[data-pid="${pid}"]`);
-  if(!card) return;
-  card.querySelectorAll('.product-img-slide').forEach((s,i)=>s.classList.toggle('active',i===idx));
-  card.querySelectorAll('.slide-dot').forEach((d,i)=>d.classList.toggle('active',i===idx));
-}
-
-function slideDir(pid, dir) {
-  const card = document.querySelector(`[data-pid="${pid}"]`);
-  if(!card) return;
-  const slides = card.querySelectorAll('.product-img-slide');
-  let cur = [...slides].findIndex(s=>s.classList.contains('active'));
-  let next = (cur + dir + slides.length) % slides.length;
-  slideTo(pid, next);
-}
-
 function renderProducts() {
   const search = (document.getElementById('searchInput')?.value||'').toLowerCase();
   const active = document.querySelector('#filterBar .filter-btn.active')?.dataset.cat||'All';
@@ -990,8 +777,8 @@ function renderProducts() {
   const grid = document.getElementById('productGrid');
   if(!filtered.length){grid.innerHTML='<div class="no-products">No parts found. Try a different search or filter.</div>';return;}
   grid.innerHTML = filtered.map(p=>`
-    <div class="product-card" data-pid="${p.id}">
-      ${makeProductImgHTML(p)}
+    <div class="product-card">
+      <div class="product-img">${p.emoji||'🔧'}</div>
       <div class="product-info">
         <div class="product-cat">${p.cat}</div>
         <div class="product-name">${p.name}</div>
@@ -1004,55 +791,6 @@ function renderProducts() {
     </div>`).join('');
 }
 
-function openProductPage(id) {
-  const p = products.find(x => x.id === id);
-  if(!p) return;
-
-  // Main photo or emoji
-  const mainImg = document.getElementById('pdpMainImg');
-  if(p.photos && p.photos.length) {
-    mainImg.innerHTML = p.photos.map((src,i) =>
-      `<img src="${src}" class="${i===0?'active':''}" alt="${p.name} photo ${i+1}">`
-    ).join('');
-  } else {
-    mainImg.innerHTML = `<div class="pdp-main-emoji">${p.emoji||'🔧'}</div>`;
-  }
-
-  // Thumbnails (only shown when multiple photos)
-  const thumbsEl = document.getElementById('pdpThumbs');
-  if(p.photos && p.photos.length > 1) {
-    thumbsEl.innerHTML = p.photos.map((src,i) =>
-      `<div class="pdp-thumb ${i===0?'active':''}" onclick="pdpSelectPhoto(${i})">
-        <img src="${src}" alt="photo ${i+1}">
-      </div>`
-    ).join('');
-  } else {
-    thumbsEl.innerHTML = '';
-  }
-
-  // Text fields
-  document.getElementById('pdpCat').textContent = p.cat;
-  document.getElementById('pdpName').textContent = p.name;
-  document.getElementById('pdpPrice').textContent = '$' + parseFloat(p.price).toFixed(2);
-  document.getElementById('pdpDesc').textContent = p.desc;
-
-  const stockEl = document.getElementById('pdpStock');
-  stockEl.textContent = p.stock === 'in' ? '✔ In Stock' : '✘ Out of Stock';
-  stockEl.className = 'pdp-stock-badge ' + (p.stock === 'in' ? 'in' : 'out');
-
-  const addBtn = document.getElementById('pdpAddBtn');
-  addBtn.disabled = p.stock !== 'in';
-  addBtn.textContent = p.stock === 'in' ? 'Add to Cart' : 'Out of Stock';
-  addBtn.onclick = () => { addToCart(p.id); showToast(`${p.name} added to cart!`, 'success'); };
-
-  showPage('product');
-}
-
-function pdpSelectPhoto(idx) {
-  document.querySelectorAll('#pdpMainImg img').forEach((img,i) => img.classList.toggle('active', i===idx));
-  document.querySelectorAll('#pdpThumbs .pdp-thumb').forEach((t,i) => t.classList.toggle('active', i===idx));
-}
-
 function renderGallery() {
   const active = document.querySelector('#galleryFilterBar .filter-btn.active')?.dataset.cat||'All';
   const gb = document.getElementById('galleryFilterBar');
@@ -1060,33 +798,27 @@ function renderGallery() {
   let filtered = active==='All'?products:products.filter(p=>p.cat===active);
   const grid = document.getElementById('galleryGrid');
   if(!filtered.length){grid.innerHTML='<div class="no-products">No products in this category yet.</div>';return;}
-  grid.innerHTML = filtered.map(p=>{
-    const thumb = p.photos&&p.photos.length
-      ? `<img src="${p.photos[0]}" style="width:100%;height:100%;object-fit:cover" alt="${p.name}">`
-      : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:72px">${p.emoji||'🔧'}</div>`;
-    return `
-    <div class="product-card" data-pid="${p.id}">
-      <div onclick="openProductPage(${p.id})" style="cursor:pointer">
-        <div style="height:240px;background:var(--mid);overflow:hidden">${thumb}</div>
-        <div class="product-info" style="padding-bottom:8px">
-          <div class="product-cat">${p.cat}</div>
-          <div class="product-name">${p.name}</div>
+  grid.innerHTML = filtered.map(p=>`
+    <div class="product-card">
+      <div class="product-img" style="height:240px;font-size:80px">${p.emoji||'🔧'}</div>
+      <div class="product-info">
+        <div class="product-cat">${p.cat}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.desc}</div>
+        <div class="product-footer">
+          <div class="product-price">$${parseFloat(p.price).toFixed(2)}</div>
+          ${p.stock==='in'?`<button class="add-cart-btn" onclick="addToCart(${p.id})">Add to Cart</button>`:`<span style="font-size:12px;color:var(--gray)">Out of Stock</span>`}
         </div>
       </div>
-      <div style="padding:0 16px 16px;display:flex;align-items:center;justify-content:space-between">
-        <div class="product-price">$${parseFloat(p.price).toFixed(2)}</div>
-        ${p.stock==='in'
-          ? `<button class="add-cart-btn" onclick="addToCart(${p.id})">Add to Cart</button>`
-          : `<span style="font-size:12px;color:var(--gray)">Out of Stock</span>`}
-      </div>
-    </div>`;
-  }).join('');
+    </div>`).join('');
 }
 
 function setFilter(cat,barId) {
   document.querySelectorAll('#'+barId+' .filter-btn').forEach(b=>b.classList.remove('active'));
   document.querySelector(`#${barId} [data-cat="${cat}"]`)?.classList.add('active');
   if(barId==='filterBar') renderProducts();
+
+// Show admin page when accessed via raresautoexp.com/admin
   else renderGallery();
 }
 
@@ -1108,7 +840,7 @@ function updateCartUI() {
   if(!cart.length){items.innerHTML='<div class="empty-cart"><div class="icon">🛒</div><p>Your cart is empty</p></div>';return;}
   items.innerHTML = cart.map(i=>`
     <div class="cart-item">
-      <div class="cart-item-emoji">${i.photos&&i.photos.length?`<img src="${i.photos[0]}" style="width:100%;height:100%;object-fit:cover;border-radius:6px">`:i.emoji||'🔧'}</div>
+      <div class="cart-item-emoji">${i.emoji||'🔧'}</div>
       <div class="cart-item-info">
         <div class="cart-item-name">${i.name}</div>
         <div class="cart-item-price">$${(i.price*i.qty).toFixed(2)}</div>
@@ -1227,7 +959,7 @@ function renderAdminStats(){
 function renderDashRecent(){
   const recent=products.slice(-5).reverse();
   document.getElementById('dashRecentTable').innerHTML=recent.map(p=>`
-    <tr><td class="td-emoji">${p.photos&&p.photos.length?`<img src="${p.photos[0]}" style="width:40px;height:40px;object-fit:cover;border-radius:4px">`:p.emoji||'🔧'}</td><td>${p.name}</td><td><span class="td-cat">${p.cat}</span></td><td class="td-price">$${parseFloat(p.price).toFixed(2)}</td>
+    <tr><td class="td-emoji">${p.emoji||'🔧'}</td><td>${p.name}</td><td><span class="td-cat">${p.cat}</span></td><td class="td-price">$${parseFloat(p.price).toFixed(2)}</td>
     <td><span class="product-stock ${p.stock==='in'?'in-stock':'out-stock'}">${p.stock==='in'?'In Stock':'Out of Stock'}</span></td></tr>`).join('');
 }
 
@@ -1235,7 +967,7 @@ function renderAdminTable(){
   const search=(document.getElementById('adminSearch')?.value||'').toLowerCase();
   let filtered=products.filter(p=>!search||p.name.toLowerCase().includes(search)||p.cat.toLowerCase().includes(search));
   document.getElementById('adminProductTable').innerHTML=filtered.map(p=>`
-    <tr><td class="td-emoji">${p.photos&&p.photos.length?`<img src="${p.photos[0]}" style="width:40px;height:40px;object-fit:cover;border-radius:4px">`:p.emoji||'🔧'}</td><td style="font-weight:500">${p.name}</td>
+    <tr><td class="td-emoji">${p.emoji||'🔧'}</td><td style="font-weight:500">${p.name}</td>
     <td><span class="td-cat">${p.cat}</span></td><td class="td-price">$${parseFloat(p.price).toFixed(2)}</td>
     <td><span class="product-stock ${p.stock==='in'?'in-stock':'out-stock'}">${p.stock==='in'?'In Stock':'Out of Stock'}</span></td>
     <td><div class="action-btns"><button class="btn-edit" onclick="openProductModal(${p.id})">Edit</button><button class="btn-delete" onclick="deleteProduct(${p.id})">Delete</button></div></td></tr>`).join('');
@@ -1244,7 +976,6 @@ function renderAdminTable(){
 
 function openProductModal(id=null){
   editId=id;
-  pendingPhotos=[];
   const modal=document.getElementById('productModal');
   const picker=document.getElementById('emojiPicker');
   picker.innerHTML=EMOJIS.map(e=>`<span class="emoji-opt${selectedEmoji===e?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
@@ -1259,15 +990,11 @@ function openProductModal(id=null){
     document.getElementById('pStock').value=p.stock;
     selectedEmoji=p.emoji||'🔧';
     picker.innerHTML=EMOJIS.map(e=>`<span class="emoji-opt${selectedEmoji===e?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
-    pendingPhotos=p.photos?[...p.photos]:[];
   } else {
     document.getElementById('modalTitle').textContent='ADD PRODUCT';
     document.getElementById('pName').value='';document.getElementById('pCat').value='Brakes';document.getElementById('pDesc').value='';document.getElementById('pPrice').value='';document.getElementById('pStock').value='in';
     selectedEmoji='🔧';
-    pendingPhotos=[];
   }
-  document.getElementById('photoFileInput').value='';
-  renderPhotoPreviews();
   modal.classList.add('open');
 }
 
@@ -1278,7 +1005,7 @@ function saveProduct(){
   const name=document.getElementById('pName').value.trim();
   const price=parseFloat(document.getElementById('pPrice').value);
   if(!name||isNaN(price)||price<0){showToast('Please fill all required fields','error');return;}
-  const product={name,cat:document.getElementById('pCat').value,desc:document.getElementById('pDesc').value,price,emoji:selectedEmoji,stock:document.getElementById('pStock').value,photos:[...pendingPhotos]};
+  const product={name,cat:document.getElementById('pCat').value,desc:document.getElementById('pDesc').value,price,emoji:selectedEmoji,stock:document.getElementById('pStock').value};
   if(editId){
     const idx=products.findIndex(x=>x.id===editId);
     products[idx]={...product,id:editId};
@@ -1313,63 +1040,15 @@ function saveStripeKeys(){
   loadStripeUI();showToast('Settings saved!','success');
 }
 
-// PHOTO UPLOAD
 function showToast(msg,type='success'){
   const t=document.getElementById('toast');
   t.textContent=msg;t.className='toast show '+type;
   setTimeout(()=>t.className='toast',3200);
 }
 
-function handlePhotoUpload(event) {
-  const files = Array.from(event.target.files);
-  const remaining = 5 - pendingPhotos.length;
-  if(remaining <= 0) { showToast('Maximum 5 photos allowed','error'); return; }
-  const toAdd = files.slice(0, remaining);
-  if(files.length > remaining) showToast(`Only ${remaining} more photo(s) can be added (max 5)`, 'error');
-  toAdd.forEach(file => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      pendingPhotos.push(e.target.result);
-      renderPhotoPreviews();
-    };
-    reader.readAsDataURL(file);
-  });
-  event.target.value = '';
-}
-
-function renderPhotoPreviews() {
-  const container = document.getElementById('photoPreviews');
-  const label = document.getElementById('photoCountLabel');
-  if(!container) return;
-  container.innerHTML = pendingPhotos.map((src,i) => `
-    <div class="photo-thumb">
-      <img src="${src}" alt="Photo ${i+1}">
-      <button class="photo-thumb-remove" onclick="removePhoto(${i})">✕</button>
-    </div>`).join('');
-  if(label) label.textContent = pendingPhotos.length > 0 ? `${pendingPhotos.length}/5 photo${pendingPhotos.length>1?'s':''} added` : '';
-  const uploadArea = document.querySelector('.photo-upload-area .photo-upload-label');
-  if(uploadArea) {
-    if(pendingPhotos.length >= 5) uploadArea.innerHTML = '✅ Maximum 5 photos reached';
-    else uploadArea.innerHTML = `📷 <span>Click to upload photos</span> or drag & drop<br>JPG, PNG, WEBP — ${5-pendingPhotos.length} slot${5-pendingPhotos.length!==1?'s':''} remaining`;
-  }
-}
-
-function removePhoto(idx) {
-  pendingPhotos.splice(idx, 1);
-  renderPhotoPreviews();
-}
-
-// MOBILE NAV
-function toggleMobileNav() {
-  document.getElementById('navLinks').classList.toggle('mobile-open');
-}
-function closeMobileNav() {
-  document.getElementById('navLinks').classList.remove('mobile-open');
-}
-
 renderProducts();
 
-// Redirect to admin page if accessed via /admin path
+// Show admin page when accessed via raresautoexp.com/admin
 if (window.location.pathname === '/admin') showPage('admin');
 </script>
 </body>
