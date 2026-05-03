@@ -809,79 +809,53 @@
 const EMOJIS = ['🔧','⚙️','🛞','💡','🔩','🪛','🔌','🛢️','🏎️','🔋','💨','🔥','❄️','🪝','⛽','🔑','🛠️','📡','🎛️','🧲'];
 const CATEGORIES = ['All','Brakes','Engine','Suspension','Electrical','Filters','Exhaust','Lighting','Transmission','Cooling','Body'];
 
-let products = JSON.parse(localStorage.getItem('acProducts') || '[]');
+let products = [];
 let heroImages = JSON.parse(localStorage.getItem('acHeroImages') || '[]');
 let cart = [];
 let editId = null;
 let selectedEmoji = '🔧';
 let modalPhotos = []; // base64 photos being edited in modal
-let BACKEND_URL = localStorage.getItem('acBackendUrl') || '';
 let stripeKeys = JSON.parse(localStorage.getItem('acStripe') || '{}');
+let BACKEND_URL = localStorage.getItem('acBackendUrl') || '';
+
+// API base URL — points to the Render backend (same URL used for Stripe)
+// Reads from the BACKEND_URL already configured by the admin in Stripe Settings
+function getApiBase() {
+  return (localStorage.getItem('acBackendUrl') || '').replace(/\/$/, '');
+}
 
 // ============================================================
-// INDEXEDDB — unlimited photo storage
+// API HELPERS
 // ============================================================
-let photoDB = null;
-
-function openPhotoDB(){
-  return new Promise((resolve, reject) => {
-    if(photoDB){ resolve(photoDB); return; }
-    const req = indexedDB.open('raresPhotos', 1);
-    req.onupgradeneeded = e => {
-      e.target.result.createObjectStore('photos', { keyPath: 'key' });
-    };
-    req.onsuccess = e => { photoDB = e.target.result; resolve(photoDB); };
-    req.onerror = () => reject(req.error);
+async function apiFetch(path, options={}) {
+  const base = getApiBase();
+  if (!base) throw new Error('Backend URL not configured. Go to Admin → Stripe Settings.');
+  const res = await fetch(base + path, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options
   });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
 }
 
-function dbSavePhotos(productId, photosArr){
-  return openPhotoDB().then(db => new Promise((resolve, reject) => {
-    const tx = db.transaction('photos', 'readwrite');
-    const store = tx.objectStore('photos');
-    store.put({ key: 'product_' + productId, photos: photosArr });
-    tx.oncomplete = resolve;
-    tx.onerror = () => reject(tx.error);
-  }));
+async function loadProducts() {
+  try {
+    const raw = await apiFetch('/api/products');
+    // Normalize: photos come back as {url, public_id} objects — extract just the URL for display
+    products = raw.map(p => ({
+      ...p,
+      photos: (p.photos || []).map(ph => typeof ph === 'string' ? ph : ph.url).filter(Boolean)
+    }));
+    renderProducts();
+    renderGallery();
+    renderAdminTable();
+    renderDashRecent();
+    renderAdminStats();
+  } catch(e) {
+    console.error('Could not load products:', e);
+    showToast('Could not connect to server','error');
+  }
 }
-
-function dbGetPhotos(productId){
-  return openPhotoDB().then(db => new Promise((resolve) => {
-    const req = db.transaction('photos', 'readonly')
-                  .objectStore('photos')
-                  .get('product_' + productId);
-    req.onsuccess = () => resolve(req.result ? req.result.photos : []);
-    req.onerror = () => resolve([]);
-  }));
-}
-
-function dbDeletePhotos(productId){
-  return openPhotoDB().then(db => new Promise((resolve) => {
-    const tx = db.transaction('photos', 'readwrite');
-    tx.objectStore('photos').delete('product_' + productId);
-    tx.oncomplete = resolve;
-    tx.onerror = resolve;
-  }));
-}
-
-// Load photos from IndexedDB into each product object, then re-render
-function loadAllPhotosAndRender(){
-  if(!products.length){ renderProducts(); renderGallery(); return; }
-  let done = 0;
-  products.forEach(p => {
-    dbGetPhotos(p.id).then(photos => {
-      p.photos = photos;
-      done++;
-      if(done === products.length){
-        renderProducts();
-        renderGallery();
-        renderAdminTable();
-        renderDashRecent();
-        renderHeroSlideshow();
-      }
-    });
-  });
-};
 
 // Hero slideshow state
 let heroIdx = 0;
@@ -895,35 +869,6 @@ let ppProduct = null;
 let ppIdx = 0;
 let ppFromPage = 'shop';
 
-// ============================================================
-// SEED DEFAULT PRODUCTS
-// ============================================================
-if (products.length === 0) {
-  products = [
-    {id:1,name:'Bosch Brake Pads',cat:'Brakes',desc:'OEM-quality ceramic brake pads for superior stopping power and reduced brake dust.',price:49.99,emoji:'🛞',stock:'in',photos:[]},
-    {id:2,name:'K&N Air Filter',cat:'Filters',desc:'High-flow air filter that increases horsepower and acceleration while protecting the engine.',price:34.99,emoji:'💨',stock:'in',photos:[]},
-    {id:3,name:'Monroe Shock Absorber',cat:'Suspension',desc:'Gas-charged shock absorbers for a smooth, controlled ride on any road surface.',price:79.99,emoji:'🔩',stock:'in',photos:[]},
-    {id:4,name:'NGK Spark Plugs (4pk)',cat:'Engine',desc:'Iridium tip spark plugs for maximum fuel efficiency and longer service life.',price:28.99,emoji:'🔥',stock:'in',photos:[]},
-    {id:5,name:'Philips H7 LED Kit',cat:'Lighting',desc:'Ultra-bright LED headlight conversion kit, 6000K cool white, plug-and-play.',price:64.99,emoji:'💡',stock:'in',photos:[]},
-    {id:6,name:'Optima RedTop Battery',cat:'Electrical',desc:'High-performance AGM battery for reliable starts in all weather conditions.',price:219.99,emoji:'🔋',stock:'out',photos:[]},
-  ];
-  saveProducts();
-}
-
-function saveProducts() {
-  try {
-    // Only save metadata to localStorage — photos live in IndexedDB
-    const meta = products.map(p => {
-      const {photos, ...rest} = p;
-      return rest;
-    });
-    localStorage.setItem('acProducts', JSON.stringify(meta));
-    return true;
-  } catch(e) {
-    showToast('Could not save product data.','error');
-    return false;
-  }
-}
 function saveHeroImages() {
   try { localStorage.setItem('acHeroImages', JSON.stringify(heroImages)); } catch(e) {}
 }
@@ -1477,13 +1422,7 @@ function openProductModal(id=null){
     document.getElementById('pPrice').value=p.price;
     document.getElementById('pStock').value=p.stock;
     selectedEmoji=p.emoji||'🔧';
-    picker.innerHTML=EMOJIS.map(e=>`<span class="emoji-opt${selectedEmoji===e?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
-    modal.classList.add('open');
-    // Load photos fresh from IndexedDB
-    dbGetPhotos(id).then(photos=>{
-      modalPhotos=photos||[];
-      renderModalPhotos();
-    });
+    modalPhotos=[...(p.photos||[])];
   } else {
     document.getElementById('modalTitle').textContent='ADD PRODUCT';
     document.getElementById('pName').value='';
@@ -1493,10 +1432,10 @@ function openProductModal(id=null){
     document.getElementById('pStock').value='in';
     selectedEmoji='🔧';
     modalPhotos=[];
-    picker.innerHTML=EMOJIS.map(e=>`<span class="emoji-opt${selectedEmoji===e?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
-    renderModalPhotos();
-    modal.classList.add('open');
   }
+  picker.innerHTML=EMOJIS.map(e=>`<span class="emoji-opt${selectedEmoji===e?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
+  renderModalPhotos();
+  modal.classList.add('open');
 }
 
 function renderModalPhotos(){
@@ -1553,93 +1492,84 @@ function closeModal(){
   if(fi){ fi.onchange=null; fi.value=''; }
 }
 
-function compressPhoto(base64, maxW, maxH, quality, cb){
-  const img=new Image();
-  img.onload=function(){
-    const canvas=document.createElement('canvas');
-    let w=img.width, h=img.height;
-    if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
-    if(h>maxH){w=Math.round(w*maxH/h);h=maxH;}
-    canvas.width=w; canvas.height=h;
-    canvas.getContext('2d').drawImage(img,0,0,w,h);
-    cb(canvas.toDataURL('image/jpeg', quality));
-  };
-  img.src=base64;
-}
-
-function saveProduct(andReturn){
-  const name=document.getElementById('pName').value.trim();
-  const price=parseFloat(document.getElementById('pPrice').value);
-  if(!name||isNaN(price)||price<0){showToast('Please fill all required fields','error');return false;}
-
-  // Compress photos then save
-  const rawPhotos=[...modalPhotos];
-  if(rawPhotos.length===0){
-    _doSaveProduct(andReturn, name, price, []);
-    return true;
-  }
-  let done=0;
-  const compressed=[];
-  rawPhotos.forEach((src,i)=>{
-    compressPhoto(src,800,600,0.7,function(result){
-      compressed[i]=result;
-      done++;
-      if(done===rawPhotos.length) _doSaveProduct(andReturn, name, price, compressed);
-    });
+function compressPhoto(base64, maxW, maxH, quality){
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = function(){
+      const canvas = document.createElement('canvas');
+      let w = img.width, h = img.height;
+      if(w > maxW){ h = Math.round(h * maxW / w); w = maxW; }
+      if(h > maxH){ w = Math.round(w * maxH / h); h = maxH; }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = base64;
   });
-  return true;
 }
 
-function _doSaveProduct(andReturn, name, price, photos){
-  const product={
+async function saveProduct(andReturn){
+  const name = document.getElementById('pName').value.trim();
+  const price = parseFloat(document.getElementById('pPrice').value);
+  if(!name || isNaN(price) || price < 0){ showToast('Please fill all required fields','error'); return; }
+
+  // Compress any new base64 photos; existing URL photos pass through unchanged
+  const photos = await Promise.all(modalPhotos.map(src =>
+    src.startsWith('data:') ? compressPhoto(src, 1200, 900, 0.82) : Promise.resolve(src)
+  ));
+
+  const payload = {
     name,
-    cat:document.getElementById('pCat').value,
-    desc:document.getElementById('pDesc').value,
+    cat: document.getElementById('pCat').value,
+    desc: document.getElementById('pDesc').value,
     price,
-    emoji:selectedEmoji,
-    stock:document.getElementById('pStock').value,
-    photos:photos  // kept in memory for rendering; not written to localStorage
+    emoji: selectedEmoji,
+    stock: document.getElementById('pStock').value,
+    photos
   };
-  let productId;
-  if(editId){
-    const idx=products.findIndex(x=>x.id===editId);
-    products[idx]={...product,id:editId};
-    productId=editId;
-    showToast('Product updated!','success');
-  } else {
-    product.id=Date.now();
-    products.push(product);
-    productId=product.id;
-    showToast('Product added!','success');
-  }
-  // Save metadata to localStorage (no photos)
-  saveProducts();
-  // Save photos to IndexedDB (no size limit)
-  dbSavePhotos(productId, photos).then(()=>{
+
+  try {
+    let saved;
+    if(editId){
+      saved = await apiFetch('/api/products/' + editId, { method:'PUT', body: JSON.stringify(payload) });
+      saved.photos = (saved.photos || []).map(ph => typeof ph === 'string' ? ph : ph.url).filter(Boolean);
+      const idx = products.findIndex(x => x.id === editId);
+      if(idx > -1) products[idx] = saved;
+      showToast('Product updated!', 'success');
+    } else {
+      saved = await apiFetch('/api/products', { method:'POST', body: JSON.stringify(payload) });
+      saved.photos = (saved.photos || []).map(ph => typeof ph === 'string' ? ph : ph.url).filter(Boolean);
+      products.push(saved);
+      showToast('Product added!', 'success');
+    }
     closeModal();
     renderAdminTable();
     renderDashRecent();
     if(andReturn){
       setTimeout(function(){
-        const productsTabBtn=Array.from(document.querySelectorAll('.sidebar-item'))
-          .find(el=>el.getAttribute('onclick')&&el.getAttribute('onclick').includes("'products'"));
-        if(productsTabBtn) showAdminTab('products',productsTabBtn);
-      },50);
+        const btn = Array.from(document.querySelectorAll('.sidebar-item'))
+          .find(el => el.getAttribute('onclick') && el.getAttribute('onclick').includes("'products'"));
+        if(btn) showAdminTab('products', btn);
+      }, 50);
     }
-  });
+  } catch(e) {
+    showToast('Error saving product: ' + e.message, 'error');
+  }
 }
 
-function saveProductAndReturn(){
-  saveProduct(true);
-}
+function saveProductAndReturn(){ saveProduct(true); }
 
-function deleteProduct(id){
-  if(!confirm('Delete this product?'))return;
-  products=products.filter(x=>x.id!==id);
-  saveProducts();
-  dbDeletePhotos(id);
-  renderAdminTable();renderDashRecent();
-  showToast('Product deleted','success');
+async function deleteProduct(id){
+  if(!confirm('Delete this product?')) return;
+  try {
+    await apiFetch('/api/products/' + id, { method:'DELETE' });
+    products = products.filter(x => x.id !== id);
+    renderAdminTable();
+    renderDashRecent();
+    showToast('Product deleted', 'success');
+  } catch(e) {
+    showToast('Error deleting product', 'error');
+  }
 }
 
 // ============================================================
@@ -1685,8 +1615,8 @@ function showToast(msg,type='success'){
 // ============================================================
 // INIT
 // ============================================================
-// Load photos from IndexedDB into products array, then render everything
-loadAllPhotosAndRender();
+loadProducts();
+renderHeroSlideshow();
 initCookieBanner();
 
 // Route to admin if URL is /admin
