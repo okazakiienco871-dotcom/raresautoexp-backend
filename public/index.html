@@ -1429,18 +1429,20 @@ function renderModalPhotos(){
 
 function handleProductPhotoUpload(e){
   const files=Array.from(e.target.files);
+  const slots=5-modalPhotos.length;
+  const toLoad=files.slice(0,slots);
+  e.target.value='';
+  if(toLoad.length===0)return;
   let loaded=0;
-  files.forEach(file=>{
-    if(modalPhotos.length>=5)return;
+  toLoad.forEach(file=>{
     const reader=new FileReader();
     reader.onload=ev=>{
       modalPhotos.push(ev.target.result);
       loaded++;
-      if(loaded===files.length){ renderModalPhotos(); }
+      if(loaded===toLoad.length){ renderModalPhotos(); }
     };
     reader.readAsDataURL(file);
   });
-  e.target.value='';
 }
 
 function removeModalPhoto(i){
@@ -1449,7 +1451,11 @@ function removeModalPhoto(i){
 }
 
 function selectEmoji(e){selectedEmoji=e;document.querySelectorAll('.emoji-opt').forEach(x=>x.classList.toggle('selected',x.textContent===e));}
-function closeModal(){document.getElementById('productModal').classList.remove('open');}
+function closeModal(){
+  document.getElementById('productModal').classList.remove('open');
+  const fi=document.getElementById('photoFileInput');
+  if(fi) fi.value='';
+}
 
 function saveProduct(andReturn){
   const name=document.getElementById('pName').value.trim();
@@ -1478,9 +1484,11 @@ function saveProduct(andReturn){
   renderDashRecent();
   closeModal();
   if(andReturn){
-    const productsTabBtn = Array.from(document.querySelectorAll('.sidebar-item'))
-      .find(el => el.getAttribute('onclick') && el.getAttribute('onclick').includes("'products'"));
-    if(productsTabBtn) showAdminTab('products', productsTabBtn);
+    setTimeout(function(){
+      const productsTabBtn = Array.from(document.querySelectorAll('.sidebar-item'))
+        .find(el => el.getAttribute('onclick') && el.getAttribute('onclick').includes("'products'"));
+      if(productsTabBtn) showAdminTab('products', productsTabBtn);
+    }, 50);
   }
   return true;
 }
