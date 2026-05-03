@@ -512,6 +512,7 @@
         <div style="padding:20px;margin-bottom:16px">
           <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:var(--red)">RARES AUTO EXPORT</div>
           <div style="font-size:12px;color:var(--gray)">raresautoexp.com</div>
+          <div style="font-size:11px;color:var(--steel);margin-top:4px">Logged in as: <span id="adminUserLabel" style="color:var(--gray)">admin</span></div>
         </div>
         <div class="admin-sidebar-title">Navigation</div>
         <div class="sidebar-item active" onclick="showAdminTab('dashboard',this)"><span class="sidebar-icon">📊</span> Dashboard</div>
@@ -789,9 +790,12 @@
       <label>Fallback Icon (if no photos)</label>
       <div class="img-emoji-picker" id="emojiPicker"></div>
     </div>
-    <div class="modal-footer">
-      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="btn-save" onclick="saveProduct()">Save Product</button>
+    <div class="modal-footer" style="flex-direction:column;gap:10px">
+      <button class="btn-save" style="width:100%;padding:14px;font-size:15px" onclick="saveProductAndReturn()">💾 Save &amp; Return to Product List</button>
+      <div style="display:flex;gap:10px;width:100%">
+        <button class="btn-save" style="flex:1" onclick="saveProduct()">Save Product</button>
+        <button class="btn-cancel" style="flex:1" onclick="closeModal()">Cancel</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1293,13 +1297,32 @@ async function handleCheckout() {
 function doLogin(){
   const u=document.getElementById('adminUser').value;
   const p=document.getElementById('adminPass').value;
-  if(u==='admin'&&p==='admin123'){
+  // Add more accounts here to allow multiple simultaneous admin sessions
+  const ADMIN_ACCOUNTS=[{user:'admin',pass:'admin123'},{user:'admin2',pass:'admin456'}];
+  const valid=ADMIN_ACCOUNTS.some(a=>a.user===u&&a.pass===p);
+  if(valid){
+    sessionStorage.setItem('adminLoggedIn','1');
+    sessionStorage.setItem('adminUser',u);
     document.getElementById('adminLogin').style.display='none';
     document.getElementById('adminDashboard').style.display='block';
+    const lbl=document.getElementById('adminUserLabel');if(lbl)lbl.textContent=u;
     renderAdminStats();renderAdminTable();renderDashRecent();
   } else { showToast('Invalid credentials','error'); }
 }
-function doLogout(){document.getElementById('adminLogin').style.display='block';document.getElementById('adminDashboard').style.display='none';}
+function doLogout(){
+  sessionStorage.removeItem('adminLoggedIn');sessionStorage.removeItem('adminUser');
+  document.getElementById('adminLogin').style.display='block';
+  document.getElementById('adminDashboard').style.display='none';
+}
+function checkAdminSession(){
+  if(sessionStorage.getItem('adminLoggedIn')==='1'){
+    document.getElementById('adminLogin').style.display='none';
+    document.getElementById('adminDashboard').style.display='block';
+    const lbl=document.getElementById('adminUserLabel');
+    if(lbl)lbl.textContent=sessionStorage.getItem('adminUser')||'admin';
+    renderAdminStats();renderAdminTable();renderDashRecent();
+  }
+}
 
 // ============================================================
 // ADMIN TABS
@@ -1431,7 +1454,7 @@ function closeModal(){document.getElementById('productModal').classList.remove('
 function saveProduct(){
   const name=document.getElementById('pName').value.trim();
   const price=parseFloat(document.getElementById('pPrice').value);
-  if(!name||isNaN(price)||price<0){showToast('Please fill all required fields','error');return;}
+  if(!name||isNaN(price)||price<0){showToast('Please fill all required fields','error');return false;}
   const product={
     name,
     cat:document.getElementById('pCat').value,
@@ -1451,6 +1474,16 @@ function saveProduct(){
     showToast('Product added!','success');
   }
   saveProducts();closeModal();renderAdminTable();renderDashRecent();
+  return true;
+}
+
+function saveProductAndReturn(){
+  const saved = saveProduct();
+  if(!saved) return;
+  // Navigate to the Products tab
+  const productsTabBtn = Array.from(document.querySelectorAll('.sidebar-item'))
+    .find(el => el.textContent.trim().startsWith('Products') || el.textContent.includes('Products'));
+  if(productsTabBtn) showAdminTab('products', productsTabBtn);
 }
 
 function deleteProduct(id){
@@ -1508,7 +1541,7 @@ renderHeroSlideshow();
 initCookieBanner();
 
 // Route to admin if URL is /admin
-if(window.location.pathname==='/admin') showPage('admin');
+if(window.location.pathname==='/admin'){ showPage('admin'); checkAdminSession(); } else { checkAdminSession(); }
 </script>
 </body>
 </html>
