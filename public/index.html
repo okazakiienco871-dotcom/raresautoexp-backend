@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rares Auto Export — Premium Auto Parts</title>
+<script src="https://js.stripe.com/v3/"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #D0251A;
+    --red-dark: #9E1B12;
+    --black: #0E0E0E;
+    --dark: #1A1A1A;
+    --mid: #2C2C2C;
+    --steel: #3E3E3E;
+    --gray: #7A7A7A;
+    --light: #E8E8E4;
+    --white: #F5F4F0;
+    --accent: #FF4433;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
+
+  /* NAV */
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 64px; background: var(--dark); border-bottom: 1px solid var(--steel); position: sticky; top: 0; z-index: 100; }
+  .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; color: var(--red); cursor: pointer; }
+  .nav-logo span { color: var(--white); }
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-links a { color: var(--gray); text-decoration: none; font-size: 14px; font-weight: 500; letter-spacing: 0.5px; cursor: pointer; transition: color 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--white); }
+  .nav-cart { background: var(--red); color: #fff; border: none; padding: 8px 20px; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 8px; }
+  .nav-cart:hover { background: var(--red-dark); }
+  .cart-count { background: var(--white); color: var(--red); border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* HERO */
+  .hero { height: 520px; background: var(--dark); display: flex; align-items: center; position: relative; overflow: hidden; padding: 0 80px; }
+  .hero::before { content: ''; position: absolute; right: -100px; top: -100px; width: 700px; height: 700px; background: radial-gradient(circle, rgba(208,37,26,0.08) 0%, transparent 70%); }
+  .hero-stripe { position: absolute; left: 0; top: 0; width: 6px; height: 100%; background: var(--red); }
+  .hero-content { max-width: 560px; }
+  .hero-eyebrow { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--red); font-weight: 600; margin-bottom: 16px; }
+  .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: 88px; line-height: 0.9; letter-spacing: 2px; margin-bottom: 24px; }
+  .hero-title span { color: var(--red); }
+  .hero-sub { color: var(--gray); font-size: 16px; line-height: 1.6; margin-bottom: 36px; max-width: 420px; }
+  .hero-cta { display: flex; gap: 12px; }
+  .btn-primary { background: var(--red); color: #fff; border: none; padding: 14px 32px; font-size: 15px; font-weight: 600; letter-spacing: 0.5px; cursor: pointer; border-radius: 4px; transition: background 0.2s; }
+  .btn-primary:hover { background: var(--red-dark); }
+  .btn-outline { background: transparent; color: var(--white); border: 1px solid var(--steel); padding: 14px 32px; font-size: 15px; font-weight: 500; cursor: pointer; border-radius: 4px; transition: all 0.2s; }
+  .btn-outline:hover { border-color: var(--white); }
+
+  /* STATS BAR */
+  .stats-bar { background: var(--red); padding: 16px 80px; display: flex; gap: 60px; }
+  .stat { display: flex; flex-direction: column; }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1px; }
+  .stat-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.8; }
+
+  /* SECTION */
+  .section { padding: 80px; }
+  .section-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 48px; }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 2px; }
+  .section-title span { color: var(--red); }
+  .section-sub { color: var(--gray); font-size: 14px; }
+
+  /* CATEGORY FILTER */
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 40px; flex-wrap: wrap; }
+  .filter-btn { background: transparent; border: 1px solid var(--steel); color: var(--gray); padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .filter-btn:hover, .filter-btn.active { background: var(--red); border-color: var(--red); color: #fff; }
+
+  /* PRODUCT GRID */
+  .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+  .product-card { background: var(--dark); border: 1px solid var(--steel); border-radius: 8px; overflow: hidden; transition: transform 0.2s, border-color 0.2s; cursor: pointer; }
+  .product-card:hover { transform: translateY(-4px); border-color: var(--red); }
+  .product-img { width: 100%; height: 200px; object-fit: cover; background: var(--mid); display: flex; align-items: center; justify-content: center; font-size: 60px; }
+  .product-info { padding: 16px; }
+  .product-cat { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--red); font-weight: 600; margin-bottom: 6px; }
+  .product-name { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .product-desc { font-size: 13px; color: var(--gray); margin-bottom: 12px; line-height: 1.5; }
+  .product-footer { display: flex; align-items: center; justify-content: space-between; }
+  .product-price { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--red); letter-spacing: 1px; }
+  .add-cart-btn { background: var(--red); color: #fff; border: none; padding: 8px 16px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .add-cart-btn:hover { background: var(--red-dark); }
+  .no-products { text-align: center; padding: 80px; color: var(--gray); grid-column: 1 / -1; }
+
+  /* CART PANEL */
+  .cart-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; }
+  .cart-overlay.open { display: block; }
+  .cart-panel { position: fixed; right: 0; top: 0; bottom: 0; width: 420px; background: var(--dark); border-left: 1px solid var(--steel); z-index: 201; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s; }
+  .cart-panel.open { transform: translateX(0); }
+  .cart-header { padding: 24px; border-bottom: 1px solid var(--steel); display: flex; justify-content: space-between; align-items: center; }
+  .cart-header h2 { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1px; }
+  .cart-close { background: none; border: none; color: var(--gray); font-size: 24px; cursor: pointer; line-height: 1; }
+  .cart-items { flex: 1; overflow-y: auto; padding: 16px; }
+  .cart-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--mid); }
+  .cart-item-emoji { width: 56px; height: 56px; background: var(--mid); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+  .cart-item-info { flex: 1; }
+  .cart-item-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .cart-item-price { font-size: 13px; color: var(--red); font-weight: 600; }
+  .cart-item-qty { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .qty-btn { background: var(--mid); border: none; color: var(--white); width: 24px; height: 24px; border-radius: 4px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+  .cart-item-remove { background: none; border: none; color: var(--gray); cursor: pointer; font-size: 18px; line-height: 1; }
+  .cart-footer { padding: 20px; border-top: 1px solid var(--steel); }
+  .cart-total { display: flex; justify-content: space-between; font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+  .cart-total span:last-child { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--red); }
+  .checkout-btn { width: 100%; background: var(--red); color: #fff; border: none; padding: 16px; font-size: 16px; font-weight: 700; border-radius: 6px; cursor: pointer; letter-spacing: 0.5px; transition: background 0.2s; }
+  .checkout-btn:hover { background: var(--red-dark); }
+  .empty-cart { text-align: center; padding: 60px 20px; color: var(--gray); }
+  .empty-cart .icon { font-size: 48px; margin-bottom: 12px; }
+
+  /* ADMIN */
+  #adminPage { background: #0A0A0A; min-height: 100vh; }
+  .admin-login { max-width: 400px; margin: 0 auto; padding: 100px 20px; }
+  .admin-login h2 { font-family: 'Bebas Neue', sans-serif; font-size: 40px; letter-spacing: 2px; margin-bottom: 8px; }
+  .admin-login p { color: var(--gray); margin-bottom: 32px; font-size: 14px; }
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray); margin-bottom: 8px; font-weight: 500; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; background: var(--dark); border: 1px solid var(--steel); color: var(--white); padding: 12px 16px; border-radius: 6px; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--red); }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+  .form-group select option { background: var(--dark); }
+
+  .admin-panel { display: grid; grid-template-columns: 240px 1fr; min-height: calc(100vh - 64px); }
+  .admin-sidebar { background: var(--dark); border-right: 1px solid var(--steel); padding: 24px 0; }
+  .admin-sidebar-title { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); padding: 0 20px; margin-bottom: 12px; font-weight: 600; }
+  .sidebar-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 14px; color: var(--gray); cursor: pointer; transition: all 0.15s; border-left: 3px solid transparent; }
+  .sidebar-item:hover { color: var(--white); background: rgba(255,255,255,0.03); }
+  .sidebar-item.active { color: var(--white); border-left-color: var(--red); background: rgba(208,37,26,0.06); }
+  .sidebar-icon { font-size: 16px; width: 20px; text-align: center; }
+  .admin-content { padding: 40px; overflow-y: auto; }
+  .admin-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+  .admin-topbar h1 { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; }
+  .admin-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px; }
+  .admin-stat { background: var(--dark); border: 1px solid var(--steel); border-radius: 8px; padding: 20px; }
+  .admin-stat-label { font-size: 12px; color: var(--gray); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+  .admin-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--white); letter-spacing: 1px; }
+  .admin-stat-val.red { color: var(--red); }
+
+  .admin-table-wrap { background: var(--dark); border: 1px solid var(--steel); border-radius: 8px; overflow: hidden; }
+  .admin-table-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--steel); }
+  .admin-table-header h3 { font-size: 15px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: rgba(255,255,255,0.02); padding: 12px 16px; text-align: left; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray); font-weight: 600; border-bottom: 1px solid var(--steel); }
+  td { padding: 14px 16px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  .td-emoji { font-size: 24px; }
+  .td-price { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--red); letter-spacing: 1px; }
+  .td-cat { background: rgba(208,37,26,0.15); color: var(--red); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; display: inline-block; font-weight: 600; }
+  .action-btns { display: flex; gap: 8px; }
+  .btn-edit { background: rgba(255,255,255,0.06); color: var(--white); border: 1px solid var(--steel); padding: 6px 14px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 500; transition: all 0.15s; }
+  .btn-edit:hover { border-color: var(--white); }
+  .btn-delete { background: rgba(208,37,26,0.1); color: var(--red); border: 1px solid rgba(208,37,26,0.3); padding: 6px 14px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 500; transition: all 0.15s; }
+  .btn-delete:hover { background: rgba(208,37,26,0.2); }
+
+  /* MODAL */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 300; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--dark); border: 1px solid var(--steel); border-radius: 10px; width: 520px; max-width: 90vw; padding: 32px; max-height: 90vh; overflow-y: auto; }
+  .modal h3 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; margin-bottom: 24px; }
+  .modal-footer { display: flex; gap: 12px; margin-top: 24px; }
+  .modal-footer button { flex: 1; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  .btn-cancel { background: transparent; border: 1px solid var(--steel); color: var(--gray); }
+  .btn-cancel:hover { border-color: var(--white); color: var(--white); }
+  .btn-save { background: var(--red); border: none; color: #fff; }
+  .btn-save:hover { background: var(--red-dark); }
+
+  /* CHECKOUT */
+  .checkout-page { max-width: 640px; margin: 0 auto; padding: 60px 40px; }
+  .checkout-page h2 { font-family: 'Bebas Neue', sans-serif; font-size: 40px; letter-spacing: 2px; margin-bottom: 8px; }
+  .checkout-page .sub { color: var(--gray); margin-bottom: 40px; font-size: 14px; }
+  .order-summary { background: var(--dark); border: 1px solid var(--steel); border-radius: 8px; padding: 20px; margin-bottom: 32px; }
+  .order-summary h3 { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); margin-bottom: 16px; }
+  .order-line { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; border-bottom: 1px solid var(--mid); }
+  .order-line:last-child { border: none; font-weight: 600; font-size: 16px; padding-top: 12px; }
+  .stripe-notice { background: rgba(99,173,84,0.1); border: 1px solid rgba(99,173,84,0.3); border-radius: 8px; padding: 16px; margin-bottom: 24px; font-size: 13px; color: #7fd171; display: flex; gap: 10px; align-items: flex-start; }
+  .payment-field { background: var(--dark); border: 1px solid var(--steel); border-radius: 6px; padding: 14px 16px; margin-bottom: 12px; font-size: 14px; color: var(--gray); cursor: pointer; transition: border-color 0.2s; }
+  .payment-field:hover { border-color: var(--gray); }
+  .pay-btn { width: 100%; background: var(--red); color: #fff; border: none; padding: 16px; font-size: 16px; font-weight: 700; border-radius: 6px; cursor: pointer; letter-spacing: 0.5px; transition: background 0.2s; margin-top: 12px; }
+  .pay-btn:hover { background: var(--red-dark); }
+  .stripe-badge { text-align: center; margin-top: 16px; font-size: 12px; color: var(--gray); }
+  .stripe-badge a { color: var(--gray); text-decoration: underline; }
+
+  /* STRIPE CONFIG */
+  .stripe-config { background: var(--dark); border: 1px solid var(--steel); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+  .stripe-config h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
+  .stripe-config p { font-size: 13px; color: var(--gray); margin-bottom: 16px; }
+  .key-display { background: var(--mid); border-radius: 4px; padding: 8px 12px; font-family: monospace; font-size: 12px; color: var(--gray); word-break: break-all; }
+  .badge-connected { display: inline-flex; align-items: center; gap: 6px; background: rgba(99,173,84,0.1); border: 1px solid rgba(99,173,84,0.3); color: #7fd171; font-size: 12px; padding: 4px 10px; border-radius: 20px; }
+  .badge-dot { width: 6px; height: 6px; background: #7fd171; border-radius: 50%; }
+  .toast { position: fixed; bottom: 32px; right: 32px; background: var(--dark); border: 1px solid var(--steel); border-radius: 8px; padding: 14px 20px; font-size: 14px; font-weight: 500; z-index: 500; transform: translateY(80px); opacity: 0; transition: all 0.3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-color: rgba(99,173,84,0.5); color: #7fd171; }
+  .toast.error { border-color: rgba(208,37,26,0.5); color: var(--red); }
+  .search-input { background: var(--mid); border: 1px solid var(--steel); color: var(--white); padding: 9px 14px; border-radius: 6px; font-size: 13px; outline: none; width: 220px; }
+  .search-input:focus { border-color: var(--red); }
+  .section-divider { height: 1px; background: var(--steel); margin: 60px 80px; }
+  .img-emoji-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .emoji-opt { font-size: 24px; cursor: pointer; padding: 6px; border-radius: 6px; border: 2px solid transparent; transition: all 0.15s; background: var(--mid); }
+  .emoji-opt:hover, .emoji-opt.selected { border-color: var(--red); background: rgba(208,37,26,0.1); }
+  .product-stock { font-size: 12px; padding: 3px 8px; border-radius: 3px; font-weight: 600; letter-spacing: 0.5px; }
+  .in-stock { background: rgba(99,173,84,0.12); color: #7fd171; }
+  .out-stock { background: rgba(208,37,26,0.12); color: var(--red); }
+
+  /* FOOTER */
+  .site-footer { background: var(--dark); border-top: 1px solid var(--steel); padding: 60px 80px 32px; margin-top: 0; }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+  .footer-brand .nav-logo { font-size: 24px; display: block; margin-bottom: 12px; cursor: default; }
+  .footer-brand p { font-size: 13px; color: var(--gray); line-height: 1.7; max-width: 280px; margin-bottom: 16px; }
+  .footer-contact { font-size: 13px; color: var(--gray); line-height: 2; }
+  .footer-contact a { color: var(--gray); text-decoration: none; transition: color 0.2s; }
+  .footer-contact a:hover { color: var(--white); }
+  .footer-col h4 { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--white); font-weight: 600; margin-bottom: 16px; }
+  .footer-col a { display: block; font-size: 13px; color: var(--gray); text-decoration: none; margin-bottom: 10px; transition: color 0.2s; cursor: pointer; }
+  .footer-col a:hover { color: var(--white); }
+  .footer-bottom { border-top: 1px solid var(--steel); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .footer-bottom p { font-size: 12px; color: var(--gray); }
+  .footer-bottom-links { display: flex; gap: 24px; }
+  .footer-bottom-links a { font-size: 12px; color: var(--gray); text-decoration: none; cursor: pointer; transition: color 0.2s; }
+  .footer-bottom-links a:hover { color: var(--white); }
+
+  /* COOKIE BANNER */
+  .cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; background: var(--dark); border-top: 1px solid var(--steel); padding: 20px 40px; display: flex; align-items: center; justify-content: space-between; gap: 24px; z-index: 1000; flex-wrap: wrap; transform: translateY(100%); transition: transform 0.4s ease; }
+  .cookie-banner.show { transform: translateY(0); }
+  .cookie-banner-text { font-size: 13px; color: var(--gray); line-height: 1.6; flex: 1; min-width: 240px; }
+  .cookie-banner-text a { color: var(--red); text-decoration: underline; cursor: pointer; }
+  .cookie-banner-btns { display: flex; gap: 10px; flex-shrink: 0; }
+  .cookie-accept { background: var(--red); color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .cookie-accept:hover { background: var(--red-dark); }
+  .cookie-decline { background: transparent; color: var(--gray); border: 1px solid var(--steel); padding: 10px 24px; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .cookie-decline:hover { border-color: var(--white); color: var(--white); }
+
+  /* LEGAL PAGES */
+  .legal-page { max-width: 800px; margin: 0 auto; padding: 72px 40px; }
+  .legal-page h1 { font-family: 'Bebas Neue', sans-serif; font-size: 56px; letter-spacing: 2px; margin-bottom: 8px; }
+  .legal-page .legal-updated { font-size: 12px; color: var(--gray); letter-spacing: 1px; margin-bottom: 48px; padding-bottom: 24px; border-bottom: 1px solid var(--steel); }
+  .legal-page h2 { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1.5px; color: var(--red); margin: 36px 0 12px; }
+  .legal-page p { font-size: 14px; color: var(--gray); line-height: 1.85; margin-bottom: 14px; }
+  .legal-page ul { padding-left: 20px; margin-bottom: 14px; }
+  .legal-page ul li { font-size: 14px; color: var(--gray); line-height: 1.85; margin-bottom: 6px; }
+  .legal-page a { color: var(--red); text-decoration: underline; }
+  .legal-back { display: inline-flex; align-items: center; gap: 8px; color: var(--gray); font-size: 13px; cursor: pointer; margin-bottom: 40px; transition: color 0.2s; background: none; border: none; }
+  .legal-back:hover { color: var(--white); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo" onclick="showPage('shop')">RARES <span>AUTO EXPORT</span></div>
+  <div class="nav-links">
+    <a onclick="showPage('shop')" id="nav-shop" class="active">Shop</a>
+    <a onclick="showPage('gallery')" id="nav-gallery">Gallery</a>
+    <a onclick="showPage('admin')" id="nav-admin">Admin</a>
+  </div>
+  <button class="nav-cart" onclick="toggleCart()">
+    🛒 Cart <span class="cart-count" id="cartCount">0</span>
+  </button>
+</nav>
+
+<!-- SHOP PAGE -->
+<div id="shopPage" class="page active">
+  <div class="hero">
+    <div class="hero-stripe"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Quality Parts, Worldwide Export</div>
+      <div class="hero-title">RARES<br><span>AUTO EXPORT</span></div>
+      <p class="hero-sub">OEM and aftermarket auto parts for every make and model. Trusted by customers worldwide — quality you can count on.</p>
+      <div class="hero-cta">
+        <button class="btn-primary" onclick="document.getElementById('shopSection').scrollIntoView({behavior:'smooth'})">Shop Now</button>
+        <button class="btn-outline" onclick="showPage('gallery')">View Gallery</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat"><span class="stat-num">10K+</span><span class="stat-label">Parts in Stock</span></div>
+    <div class="stat"><span class="stat-num">48hr</span><span class="stat-label">Fast Shipping</span></div>
+    <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Secure Checkout</span></div>
+    <div class="stat"><span class="stat-num">5★</span><span class="stat-label">Customer Rating</span></div>
+  </div>
+
+  <div class="section" id="shopSection">
+    <div class="section-header">
+      <div><div class="section-title">OUR <span>PARTS</span></div></div>
+      <input class="search-input" type="text" placeholder="Search parts..." id="searchInput" oninput="renderProducts()">
+    </div>
+    <div class="filter-bar" id="filterBar"></div>
+    <div class="product-grid" id="productGrid"></div>
+  </div>
+</div>
+
+<!-- GALLERY PAGE -->
+<div id="galleryPage" class="page">
+  <div class="section">
+    <div class="section-header">
+      <div>
+        <div class="section-title">PARTS <span>GALLERY</span></div>
+        <div class="section-sub">Browse our full inventory by category</div>
+      </div>
+    </div>
+    <div class="filter-bar" id="galleryFilterBar"></div>
+    <div class="product-grid" id="galleryGrid"></div>
+  </div>
+</div>
+
+<!-- ADMIN PAGE -->
+<div id="adminPage" class="page">
+  <div id="adminLogin">
+    <div class="admin-login">
+      <h2>RARES AUTO <span style="color:var(--red)">ADMIN</span></h2>
+      <p>Rares Auto Export — Admin Panel</p>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="adminUser" placeholder="admin" />
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()" />
+      </div>
+      <button class="btn-primary" style="width:100%;margin-top:8px" onclick="doLogin()">Login</button>
+      <p style="font-size:12px;color:var(--gray);margin-top:16px;text-align:center">Default: admin / admin123</p>
+    </div>
+  </div>
+
+  <div id="adminDashboard" style="display:none">
+    <div class="admin-panel">
+      <div class="admin-sidebar">
+        <div style="padding:20px;margin-bottom:16px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:var(--red)">RARES AUTO EXPORT</div>
+          <div style="font-size:12px;color:var(--gray)">raresautoexp.com</div>
+        </div>
+        <div class="admin-sidebar-title">Navigation</div>
+        <div class="sidebar-item active" onclick="showAdminTab('dashboard',this)"><span class="sidebar-icon">📊</span> Dashboard</div>
+        <div class="sidebar-item" onclick="showAdminTab('products',this)"><span class="sidebar-icon">🔧</span> Products</div>
+        <div class="sidebar-item" onclick="showAdminTab('stripe',this)"><span class="sidebar-icon">💳</span> Stripe Settings</div>
+        <div style="margin-top:auto;padding:20px">
+          <button onclick="doLogout()" style="width:100%;background:transparent;border:1px solid var(--steel);color:var(--gray);padding:10px;border-radius:6px;cursor:pointer;font-size:13px">Sign Out</button>
+        </div>
+      </div>
+
+      <div class="admin-content">
+        <!-- DASHBOARD TAB -->
+        <div id="tab-dashboard">
+          <div class="admin-topbar"><h1>DASHBOARD</h1></div>
+          <div class="admin-stats">
+            <div class="admin-stat"><div class="admin-stat-label">Total Products</div><div class="admin-stat-val red" id="statProducts">0</div></div>
+            <div class="admin-stat"><div class="admin-stat-label">Categories</div><div class="admin-stat-val" id="statCats">0</div></div>
+            <div class="admin-stat"><div class="admin-stat-label">In Stock</div><div class="admin-stat-val" id="statStock">0</div></div>
+            <div class="admin-stat"><div class="admin-stat-label">Avg. Price</div><div class="admin-stat-val red" id="statAvg">$0</div></div>
+          </div>
+          <div class="admin-table-wrap">
+            <div class="admin-table-header"><h3>Recent Products</h3></div>
+            <table><thead><tr><th>Item</th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th></tr></thead>
+            <tbody id="dashRecentTable"></tbody></table>
+          </div>
+        </div>
+
+        <!-- PRODUCTS TAB -->
+        <div id="tab-products" style="display:none">
+          <div class="admin-topbar">
+            <h1>PRODUCTS</h1>
+            <button class="btn-primary" onclick="openProductModal()">+ Add Product</button>
+          </div>
+          <div class="admin-table-wrap">
+            <div class="admin-table-header">
+              <h3>All Products</h3>
+              <input class="search-input" type="text" placeholder="Search..." id="adminSearch" oninput="renderAdminTable()">
+            </div>
+            <table><thead><tr><th></th><th>Name</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th></tr></thead>
+            <tbody id="adminProductTable"></tbody></table>
+          </div>
+        </div>
+
+        <!-- STRIPE TAB -->
+        <div id="tab-stripe" style="display:none">
+          <div class="admin-topbar"><h1>STRIPE SETTINGS</h1></div>
+          <div class="stripe-config">
+            <h3>Stripe Integration</h3>
+            <p>Connect your Stripe account to accept payments. Your keys are stored locally in this session.</p>
+            <div class="form-group"><label>Backend Server URL</label><input type="text" id="backendUrlInput" placeholder="https://raresautoexp-payments.onrender.com" /></div>
+            <div class="form-group"><label>Stripe Publishable Key</label><input type="text" id="stripePkInput" placeholder="pk_live_..." /></div>
+            <div class="form-group"><label>Stripe Secret Key</label><input type="password" id="stripeSkInput" placeholder="sk_live_..." /></div>
+            <div style="display:flex;gap:12px;align-items:center;margin-top:8px">
+              <button class="btn-primary" onclick="saveStripeKeys()">Save Keys</button>
+              <span id="stripeStatus"></span>
+            </div>
+          </div>
+          <div class="stripe-config">
+            <h3>Integration Status</h3>
+            <p>After saving your Stripe keys, payments on the checkout page will route to your Stripe account. For production, ensure you are using live keys and have HTTPS enabled.</p>
+            <div style="font-size:13px;color:var(--gray);line-height:1.8">
+              ✅ Stripe.js loaded<br>
+              ✅ Payment button ready<br>
+              ⚙️ Add your keys above to enable real payments
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT PAGE -->
+<div id="checkoutPage" class="page">
+  <div class="checkout-page">
+    <h2>CHECKOUT</h2>
+    <p class="sub">Secure checkout powered by Stripe</p>
+    <div class="order-summary">
+      <h3>Order Summary</h3>
+      <div id="checkoutLines"></div>
+    </div>
+    <div class="stripe-notice">
+      <span>🔒</span>
+      <span>Your payment is secured by Stripe. Your card details are never stored on our servers.</span>
+    </div>
+    <div class="form-group"><label>Full Name</label><input type="text" id="chkName" placeholder="John Doe" /></div>
+    <div class="form-group"><label>Email</label><input type="email" id="chkEmail" placeholder="john@example.com" /></div>
+    <div class="form-group"><label>Address</label><input type="text" id="chkAddress" placeholder="123 Main St" /></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label>City</label><input type="text" id="chkCity" placeholder="Miami" /></div>
+      <div class="form-group"><label>ZIP</label><input type="text" id="chkZip" placeholder="33101" /></div>
+    </div>
+    <div id="stripeCardMount" style="margin-top:8px"></div>
+    <button class="pay-btn" id="payBtn" onclick="handleCheckout()">PAY NOW</button>
+    <div class="stripe-badge">Powered by <a href="https://stripe.com" target="_blank">Stripe</a> · SSL Encrypted</div>
+    <button onclick="showPage('shop')" style="width:100%;background:transparent;border:none;color:var(--gray);padding:12px;cursor:pointer;font-size:13px;margin-top:8px">← Back to Shop</button>
+  </div>
+</div>
+
+<!-- TERMS & CONDITIONS PAGE -->
+<div id="termsPage" class="page">
+  <div class="legal-page">
+    <button class="legal-back" onclick="showPage('shop')">← Back to Shop</button>
+    <h1>TERMS &amp; <span style="color:var(--red)">CONDITIONS</span></h1>
+    <p class="legal-updated">Last revised: February 2026 &nbsp;·&nbsp; Filed with KvK under number 98948423</p>
+
+    <h2>Article 1 – Definitions</h2>
+    <p>In these terms and conditions, the following definitions apply:</p>
+    <ul>
+      <li><strong style="color:var(--white)">Webshop:</strong> Rares Auto Export (Chamber of Commerce number 98948423), owner of this website.</li>
+      <li><strong style="color:var(--white)">Customer:</strong> the natural person who enters into an agreement with the webshop.</li>
+      <li><strong style="color:var(--white)">Agreement:</strong> any order of products placed via the webshop.</li>
+    </ul>
+
+    <h2>Article 2 – Applicability</h2>
+    <p>These general terms and conditions apply to all offers, orders and agreements between the webshop and the customer.</p>
+    <p>Deviations from these terms and conditions are only valid if expressly agreed upon in writing.</p>
+
+    <h2>Article 3 – Offers and Prices</h2>
+    <p>All prices displayed on the website are in euros and include VAT, unless stated otherwise.</p>
+    <p>The webshop reserves the right to correct errors in prices or product information.</p>
+
+    <h2>Article 4 – Orders and Formation of the Agreement</h2>
+    <p>The customer may place orders via the webshop.</p>
+    <p>The agreement is concluded at the moment the webshop has received and confirmed the customer's order.</p>
+
+    <h2>Article 5 – Payment</h2>
+    <p>Payment may be made using the payment methods offered in the webshop.</p>
+    <p>Payment must be made in advance, unless stated otherwise.</p>
+
+    <h2>Article 6 – Delivery and Shipping</h2>
+    <p>Our webshop delivers products within the Netherlands and, where possible, internationally.</p>
+    <p>Any delivery times stated are indicative only and do not constitute a binding delivery period. We aim to deliver products as quickly as possible.</p>
+    <p>The risk of loss or damage to the products transfers to the customer at the moment the products are delivered to the customer. The customer is expected to inspect the products upon receipt and must report any damage or defects immediately.</p>
+
+    <h2>Article 7 – Right of Withdrawal (14 Days)</h2>
+    <p>Consumers have the right to withdraw from the agreement within fourteen (14) days (statutory right of withdrawal).</p>
+    <p>The withdrawal period starts on the day the customer receives the product.</p>
+    <p>The product must be returned unused and in its original condition, insofar as reasonably possible. The customer may only handle and inspect the product as would be permitted in a physical retail store. For further information, we refer to our return policy on the website.</p>
+    <p>The costs of returning the product are borne by the customer, unless stated otherwise.</p>
+    <p>After receipt of the returned product, we will refund the original purchase amount, excluding shipping costs, within fourteen (14) days using the same payment method used for the original transaction.</p>
+    <p>The right of withdrawal does not apply to specially ordered or custom-made products, or to products that can no longer be sold as new due to installation, use or damage.</p>
+
+    <h2>Article 8 – Complaints and Warranty</h2>
+    <p>The customer is obliged to inspect the delivered product immediately upon receipt for visible defects, damage or deviations. Any complaints regarding such issues must be reported to Rares Auto Export in writing or by e-mail as soon as possible, but no later than seven (7) days after receipt of the product.</p>
+    <p>Complaints regarding non-visible defects that become apparent only after use must be reported to Rares Auto Export within a reasonable period after discovery.</p>
+    <p>If a complaint is found to be justified, Rares Auto Export will, at its own discretion, repair or replace the product or refund (part of) the purchase price.</p>
+    <p>Rares Auto Export provides a warranty of one (1) year on its products, unless explicitly stated otherwise.</p>
+    <p>The warranty shall lapse if:</p>
+    <ul>
+      <li>the product has been used incorrectly or improperly;</li>
+      <li>the product has been installed, modified or repaired by the customer or by third parties;</li>
+      <li>the product has been used contrary to the operating or installation instructions;</li>
+      <li>the product has been used for purposes other than those for which it is intended, including use on public roads of products intended exclusively for racing or track use;</li>
+      <li>normal wear and tear is involved.</li>
+    </ul>
+    <p>The warranty covers manufacturing and material defects only and explicitly excludes damage caused by installation, adjustment, use or combination with other (tuning) parts.</p>
+    <p>The warranty provided by Rares Auto Export does not affect the statutory rights of the consumer arising from conformity as laid down in the Dutch Civil Code.</p>
+
+    <h2>Article 9 – Privacy and Personal Data</h2>
+    <p>Personal data of the customer are processed in accordance with the webshop's privacy policy.</p>
+    <p>Data are used solely for the performance of the agreement and for legally required purposes.</p>
+
+    <h2>Article 10 – Use of Products / Liability</h2>
+    <p>Rares Auto Export shall not be liable for indirect damage, consequential damage, business damage, loss of profit or any other form of indirect damage, unless such damage is caused by intent or gross negligence on the part of Rares Auto Export.</p>
+    <p>The liability of Rares Auto Export shall, to the extent permitted by law, be limited to the amount paid by the customer for the relevant product.</p>
+    <p>The limitations of liability set out in this article do not apply if and insofar as the damage is the result of intent or gross negligence of Rares Auto Export, nor in the event of personal injury or liability arising from mandatory provisions regarding product liability.</p>
+    <p>Some of the products offered by Rares Auto Export are intended exclusively for racing, track and/or sporting use and are not approved for use on public roads. These products may affect the power and/or maximum speed of the vehicle and may not comply with legal requirements for use on public roads. The customer is solely responsible at all times for the correct, legal and safe use of the vehicle and for compliance with all applicable laws and regulations.</p>
+    <p>Use of the delivered products is entirely at the customer's own risk. Rares Auto Export accepts no liability for damage, fines, seizure, rejection during inspections or any other consequences resulting from incorrect, unlawful or prohibited use of the products.</p>
+    <p>Installation, adjustment and maintenance of the delivered products are entirely at the customer's expense and risk. Rares Auto Export shall not be liable for damage caused by incorrect or improper installation or adjustment, regardless of whether such work is carried out by the customer or by third parties.</p>
+    <p>Liability of Rares Auto Export is excluded if products are used in combination with non-original parts, tuning parts or in a modified vehicle configuration.</p>
+    <p>Any installation instructions, product specifications and other information are provided for general information purposes only. No rights may be derived from such information.</p>
+    <p>The customer fully indemnifies Rares Auto Export against all third-party claims arising from the use of the delivered products, including claims for damage caused by incorrect use, installation or combination with other parts.</p>
+    <p>Rares Auto Export advises that installation and adjustment of the delivered products be carried out by a qualified or professional mechanic. Compliance with this advice is entirely the responsibility of the customer.</p>
+
+    <h2>Article 11 – Governing Law and Disputes</h2>
+    <p>All agreements are governed by Dutch law.</p>
+    <p>Disputes shall preferably be resolved by mutual consultation. If this is not possible, the dispute shall be submitted to the competent court in the Netherlands.</p>
+
+    <h2>Article 12 – Amendment and Availability of the Terms and Conditions</h2>
+    <p>These general terms and conditions have been filed with the Chamber of Commerce under number 98948423.</p>
+    <p>These terms and conditions can also be consulted on our website: <a href="https://raresautoexp.com" target="_blank">www.raresautoexp.com</a>. The most recent version of the terms and conditions applies to each agreement, or the version applicable at the time the agreement was concluded.</p>
+    <p><em>Last revised version: February 2026.</em></p>
+  </div>
+</div>
+
+<!-- PRIVACY POLICY PAGE -->
+<div id="privacyPage" class="page">
+  <div class="legal-page">
+    <button class="legal-back" onclick="showPage('shop')">← Back to Shop</button>
+    <h1>PRIVACY <span style="color:var(--red)">POLICY</span></h1>
+    <p class="legal-updated">Last updated: February 2026</p>
+
+    <h2>Who We Are</h2>
+    <p>Rares Auto Export is responsible for the processing of personal data as described in this privacy statement.</p>
+
+    <h2>Personal Data We Process</h2>
+    <p>Rares Auto Export processes your personal data because you use our services and/or because you provide this data to us yourself. Below is an overview of the personal data we process:</p>
+    <ul>
+      <li>First and last name</li>
+      <li>Bank account number</li>
+      <li>Address details</li>
+      <li>Telephone number</li>
+      <li>Email address</li>
+    </ul>
+
+    <h2>Special and/or Sensitive Personal Data</h2>
+    <p>Our website and/or services do not intend to collect data about website visitors who are under the age of 16, unless they have permission from their parents or legal guardian. However, we cannot verify whether a visitor is older than 16. We therefore advise parents to be involved in their children's online activities in order to prevent the collection of personal data about minors without parental consent.</p>
+    <p>If you believe that we have collected personal data about a minor without such consent, please contact us at <a href="mailto:info@raresautoexp.com">info@raresautoexp.com</a>, and we will delete this information.</p>
+
+    <h2>Purposes for Processing Personal Data</h2>
+    <p>Rares Auto Export processes your personal data for the following purposes:</p>
+    <ul>
+      <li>To process your payment</li>
+      <li>To deliver goods and services to you</li>
+    </ul>
+
+    <h2>Data Retention Period</h2>
+    <p>Rares Auto Export does not retain your personal data for longer than is strictly necessary to achieve the purposes for which the data is collected, unless a longer retention period is required by law.</p>
+
+    <h2>Sharing Personal Data with Third Parties</h2>
+    <p>Rares Auto Export only shares your personal data when this is necessary for the performance of the agreement or to comply with a legal obligation. This includes, for example, the processing of payments by a payment service provider and the shipment of orders by transport carriers.</p>
+    <p>The payment service provider processes only the data necessary to process your payment. The carrier uses the data exclusively to deliver your order.</p>
+    <p>Rares Auto Export never sells your personal data to third parties and only discloses it when this is necessary for the performance of the agreement or to comply with a legal obligation.</p>
+
+    <h2>Cookies, or Similar Techniques, That We Use</h2>
+    <p>Rares Auto Export uses only technical and functional cookies, as well as analytical cookies that do not infringe on your privacy. A cookie is a small text file that is stored on your computer, tablet, or smartphone when you first visit this website. The cookies we use are necessary for the technical operation of the website and for your ease of use. They ensure that the website functions properly and, for example, remember your preference settings. We may also use cookies to optimize our website.</p>
+    <p>You can opt out of cookies by setting your internet browser so that it no longer stores cookies. In addition, you can delete all information previously stored via your browser settings.</p>
+
+    <h2>Accessing, Correcting or Deleting Personal Data</h2>
+    <p>You have the right to access, correct or delete your personal data. In addition, you have the right to withdraw any consent you have given for the processing of your personal data or to object to the processing of your personal data by Rares Auto Export. You also have the right to data portability. This means that you may submit a request to us to send the personal data we hold about you in a computer file to you or to another organization designated by you.</p>
+
+    <h2>How We Protect Personal Data</h2>
+    <p>Rares Auto Export takes the protection of your data seriously and implements appropriate measures to prevent misuse, loss, unauthorized access, unwanted disclosure and unauthorized modification.</p>
+  </div>
+</div>
+
+<!-- RETURNS PAGE -->
+<div id="returnsPage" class="page">
+  <div class="legal-page">
+    <button class="legal-back" onclick="showPage('shop')">← Back to Shop</button>
+    <h1>RETURNS &amp; <span style="color:var(--red)">REFUNDS</span></h1>
+    <p class="legal-updated">Please read our return policy carefully before sending back any items.</p>
+
+    <h2>Statutory Right of Withdrawal</h2>
+    <p>You have the statutory right to return your order within 14 days of receipt. To exercise your right of withdrawal, we ask you to follow the steps below:</p>
+    <ul>
+      <li>Register your return by sending an email to <a href="mailto:info@raresautoexp.com">info@raresautoexp.com</a>.</li>
+      <li>You will then receive a return form from us. Complete this form and print it out.</li>
+      <li>Include the completed return form with the return shipment.</li>
+      <li>Send the product to the address stated on the return form.</li>
+    </ul>
+    <p><strong style="color:var(--white)">Important:</strong> The product must be unused, undamaged, and returned in its original condition. You may only handle and inspect the product as you would be allowed to do in a physical store. Exhaust systems and other engine-related parts must not have been installed or used. Once an exhaust has been installed and/or the engine has been started, the right of withdrawal expires.</p>
+    <p>We recommend returning the product, if possible, in the original packaging or in another sturdy cardboard box.</p>
+    <p>After receipt of the return shipment, we will refund the original purchase amount minus shipping costs within 14 days, provided that we have received the complete product. The refund will be made using the same payment method used for the original transaction. The costs of return shipping are at your own expense.</p>
+
+    <h2>Incorrect or Damaged Delivery</h2>
+    <p>Despite our careful handling, it may occur that you receive an incorrect or damaged item. In this case, we ask you to report this to us immediately by email, in any event within 7 days. Please follow these steps:</p>
+    <ul>
+      <li>Register the return via <a href="mailto:info@raresautoexp.com">info@raresautoexp.com</a> and include photos of the condition of the product.</li>
+      <li>You will then receive a return form from us. Complete this form and print it out.</li>
+      <li>Include the completed return form with the return shipment.</li>
+      <li>Send the product to the address stated on the return form.</li>
+    </ul>
+    <p>After receiving the return shipment, we will inspect the product and either send a replacement item free of charge or refund the full purchase amount, including shipping costs.</p>
+
+    <h2>Complaints After Use</h2>
+    <p>If you have a complaint, please contact us via <a href="mailto:info@raresautoexp.com">info@raresautoexp.com</a>. We will handle your complaint as soon as possible.</p>
+
+    <h2>Exclusion of the Right of Withdrawal</h2>
+    <p>The right of withdrawal is excluded for:</p>
+    <ul>
+      <li>Specially ordered or custom-made parts.</li>
+      <li>Products that can no longer be sold as new due to installation, use, damage, or missing parts.</li>
+    </ul>
+
+    <h2>Privacy</h2>
+    <p>The personal data you provide when registering a return or complaint is used exclusively for the handling of that return or complaint. This data is processed in accordance with our <a onclick="showPage('privacy')" style="cursor:pointer">privacy statement</a>.</p>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer" id="siteFooter">
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="nav-logo">RARES <span>AUTO EXPORT</span></span>
+      <p>OEM and aftermarket auto parts for every make and model. Trusted by customers worldwide — quality you can count on.</p>
+      <div class="footer-contact">
+        <div>📧 <a href="mailto:info@raresautoexp.com">info@raresautoexp.com</a></div>
+        <div>🌐 <a href="https://raresautoexp.com" target="_blank">raresautoexp.com</a></div>
+        <div>📦 Worldwide Export</div>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Shop</h4>
+      <a onclick="showPage('shop')">All Parts</a>
+      <a onclick="showPage('gallery')">Gallery</a>
+      <a onclick="document.getElementById('shopSection')?.scrollIntoView({behavior:'smooth'});showPage('shop')">Browse Catalogue</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a onclick="showPage('returns')">Returns &amp; Refunds</a>
+      <a onclick="showPage('terms')">Terms &amp; Conditions</a>
+      <a onclick="showPage('privacy')">Privacy Policy</a>
+      <a href="mailto:info@raresautoexp.com">Contact Us</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 Rares Auto Export. All rights reserved. &nbsp;·&nbsp; KvK-nummer: 98948423</p>
+    <div class="footer-bottom-links">
+      <a onclick="showPage('terms')">Terms &amp; Conditions</a>
+      <a onclick="showPage('privacy')">Privacy Policy</a>
+    </div>
+  </div>
+</footer>
+
+<!-- COOKIE CONSENT BANNER -->
+<div class="cookie-banner" id="cookieBanner">
+  <p class="cookie-banner-text">
+    🍪 We use cookies to improve your experience and analyze site traffic. By clicking "Accept", you consent to our use of cookies as described in our <a onclick="showPage('privacy')">Privacy Policy</a>.
+  </p>
+  <div class="cookie-banner-btns">
+    <button class="cookie-decline" onclick="cookieChoice(false)">Decline</button>
+    <button class="cookie-accept" onclick="cookieChoice(true)">Accept</button>
+  </div>
+</div>
+
+
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-header"><h2>YOUR CART</h2><button class="cart-close" onclick="toggleCart()">✕</button></div>
+  <div class="cart-items" id="cartItems"></div>
+  <div class="cart-footer">
+    <div class="cart-total"><span>Total</span><span id="cartTotal">$0.00</span></div>
+    <button class="checkout-btn" onclick="goCheckout()">Proceed to Checkout →</button>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="productModal">
+  <div class="modal">
+    <h3 id="modalTitle">ADD PRODUCT</h3>
+    <div class="form-group"><label>Product Name</label><input type="text" id="pName" placeholder="e.g. Bosch Brake Pads" /></div>
+    <div class="form-group"><label>Category</label>
+      <select id="pCat">
+        <option value="Brakes">Brakes</option>
+        <option value="Engine">Engine</option>
+        <option value="Suspension">Suspension</option>
+        <option value="Electrical">Electrical</option>
+        <option value="Filters">Filters</option>
+        <option value="Exhaust">Exhaust</option>
+        <option value="Lighting">Lighting</option>
+        <option value="Transmission">Transmission</option>
+        <option value="Cooling">Cooling</option>
+        <option value="Body">Body</option>
+      </select>
+    </div>
+    <div class="form-group"><label>Description</label><textarea id="pDesc" placeholder="Brief product description"></textarea></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div class="form-group"><label>Price ($)</label><input type="number" id="pPrice" placeholder="49.99" step="0.01" min="0"/></div>
+      <div class="form-group"><label>Stock Status</label><select id="pStock"><option value="in">In Stock</option><option value="out">Out of Stock</option></select></div>
+    </div>
+    <div class="form-group">
+      <label>Icon</label>
+      <div class="img-emoji-picker" id="emojiPicker"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-footer btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-footer btn-save" onclick="saveProduct()">Save Product</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const EMOJIS = ['🔧','⚙️','🛞','💡','🔩','🪛','🔌','🛢️','🏎️','🔋','💨','🔥','❄️','🪝','⛽','🔑','🛠️','📡','🎛️','🧲'];
+const CATEGORIES = ['All','Brakes','Engine','Suspension','Electrical','Filters','Exhaust','Lighting','Transmission','Cooling','Body'];
+
+let products = JSON.parse(localStorage.getItem('acProducts') || '[]');
+let cart = [];
+let editId = null;
+let selectedEmoji = '🔧';
+// UPDATE after deploying backend to Render.com
+// Example: 'https://raresautoexp-payments.onrender.com'
+let BACKEND_URL = localStorage.getItem('acBackendUrl') || '';
+let stripeKeys = JSON.parse(localStorage.getItem('acStripe') || '{}');
+let currentAdminTab = 'dashboard';
+
+if (products.length === 0) {
+  products = [
+    {id:1,name:'Bosch Brake Pads',cat:'Brakes',desc:'OEM-quality ceramic brake pads for superior stopping power.',price:49.99,emoji:'🛞',stock:'in'},
+    {id:2,name:'K&N Air Filter',cat:'Filters',desc:'High-flow air filter that increases horsepower and acceleration.',price:34.99,emoji:'💨',stock:'in'},
+    {id:3,name:'Monroe Shock Absorber',cat:'Suspension',desc:'Gas-charged shock absorbers for a smooth, controlled ride.',price:79.99,emoji:'🔩',stock:'in'},
+    {id:4,name:'NGK Spark Plugs (4pk)',cat:'Engine',desc:'Iridium tip spark plugs for maximum fuel efficiency.',price:28.99,emoji:'🔥',stock:'in'},
+    {id:5,name:'Philips H7 LED Kit',cat:'Lighting',desc:'Ultra-bright LED headlight conversion kit, 6000K cool white.',price:64.99,emoji:'💡',stock:'in'},
+    {id:6,name:'Optima RedTop Battery',cat:'Electrical',desc:'High-performance AGM battery for reliable starts.',price:219.99,emoji:'🔋',stock:'out'},
+  ];
+  saveProducts();
+}
+
+function saveProducts() { localStorage.setItem('acProducts',JSON.stringify(products)); }
+
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.getElementById(p+'Page').classList.add('active');
+  document.querySelectorAll('.nav-links a').forEach(x=>x.classList.remove('active'));
+  const el = document.getElementById('nav-'+p);
+  if(el) el.classList.add('active');
+  if(p==='shop') renderProducts();
+
+// Show admin page when accessed via raresautoexp.com/admin
+  if(p==='gallery') renderGallery();
+  if(p==='admin') renderAdminTable();
+  if(p==='checkout') renderCheckout();
+  // Hide footer on admin & checkout pages
+  const footer = document.getElementById('siteFooter');
+  if(footer) footer.style.display = (p==='admin'||p==='checkout') ? 'none' : 'block';
+  window.scrollTo(0,0);
+}
+
+// COOKIE CONSENT
+function cookieChoice(accepted) {
+  localStorage.setItem('cookieConsent', accepted ? 'accepted' : 'declined');
+  document.getElementById('cookieBanner').classList.remove('show');
+}
+function initCookieBanner() {
+  const consent = localStorage.getItem('cookieConsent');
+  if(!consent) {
+    setTimeout(()=>document.getElementById('cookieBanner').classList.add('show'), 800);
+  }
+}
+initCookieBanner();
+
+function renderProducts() {
+  const search = (document.getElementById('searchInput')?.value||'').toLowerCase();
+  const active = document.querySelector('#filterBar .filter-btn.active')?.dataset.cat||'All';
+  const fb = document.getElementById('filterBar');
+  fb.innerHTML = CATEGORIES.map(c=>`<button class="filter-btn ${c===active?'active':''}" data-cat="${c}" onclick="setFilter('${c}','filterBar')">${c}</button>`).join('');
+  let filtered = products.filter(p=>{
+    const matchCat = active==='All'||p.cat===active;
+    const matchSearch = !search||p.name.toLowerCase().includes(search)||p.desc.toLowerCase().includes(search)||p.cat.toLowerCase().includes(search);
+    return matchCat && matchSearch;
+  });
+  const grid = document.getElementById('productGrid');
+  if(!filtered.length){grid.innerHTML='<div class="no-products">No parts found. Try a different search or filter.</div>';return;}
+  grid.innerHTML = filtered.map(p=>`
+    <div class="product-card">
+      <div class="product-img">${p.emoji||'🔧'}</div>
+      <div class="product-info">
+        <div class="product-cat">${p.cat}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.desc}</div>
+        <div class="product-footer">
+          <div class="product-price">$${parseFloat(p.price).toFixed(2)}</div>
+          ${p.stock==='in'?`<button class="add-cart-btn" onclick="addToCart(${p.id})">Add to Cart</button>`:`<span style="font-size:12px;color:var(--gray)">Out of Stock</span>`}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function renderGallery() {
+  const active = document.querySelector('#galleryFilterBar .filter-btn.active')?.dataset.cat||'All';
+  const gb = document.getElementById('galleryFilterBar');
+  gb.innerHTML = CATEGORIES.map(c=>`<button class="filter-btn ${c===active?'active':''}" data-cat="${c}" onclick="setFilter('${c}','galleryFilterBar')">${c}</button>`).join('');
+  let filtered = active==='All'?products:products.filter(p=>p.cat===active);
+  const grid = document.getElementById('galleryGrid');
+  if(!filtered.length){grid.innerHTML='<div class="no-products">No products in this category yet.</div>';return;}
+  grid.innerHTML = filtered.map(p=>`
+    <div class="product-card">
+      <div class="product-img" style="height:240px;font-size:80px">${p.emoji||'🔧'}</div>
+      <div class="product-info">
+        <div class="product-cat">${p.cat}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.desc}</div>
+        <div class="product-footer">
+          <div class="product-price">$${parseFloat(p.price).toFixed(2)}</div>
+          ${p.stock==='in'?`<button class="add-cart-btn" onclick="addToCart(${p.id})">Add to Cart</button>`:`<span style="font-size:12px;color:var(--gray)">Out of Stock</span>`}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function setFilter(cat,barId) {
+  document.querySelectorAll('#'+barId+' .filter-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`#${barId} [data-cat="${cat}"]`)?.classList.add('active');
+  if(barId==='filterBar') renderProducts();
+
+// Show admin page when accessed via raresautoexp.com/admin
+  else renderGallery();
+}
+
+function addToCart(id) {
+  const p = products.find(x=>x.id===id);
+  if(!p||p.stock!=='in') return;
+  const existing = cart.find(x=>x.id===id);
+  if(existing) existing.qty++;
+  else cart.push({...p, qty:1});
+  updateCartUI();
+  showToast(`${p.name} added to cart!`,'success');
+}
+
+function updateCartUI() {
+  const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+  document.getElementById('cartCount').textContent = cart.reduce((s,i)=>s+i.qty,0);
+  document.getElementById('cartTotal').textContent = '$'+total.toFixed(2);
+  const items = document.getElementById('cartItems');
+  if(!cart.length){items.innerHTML='<div class="empty-cart"><div class="icon">🛒</div><p>Your cart is empty</p></div>';return;}
+  items.innerHTML = cart.map(i=>`
+    <div class="cart-item">
+      <div class="cart-item-emoji">${i.emoji||'🔧'}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${i.name}</div>
+        <div class="cart-item-price">$${(i.price*i.qty).toFixed(2)}</div>
+        <div class="cart-item-qty">
+          <button class="qty-btn" onclick="changeQty(${i.id},-1)">−</button>
+          <span style="font-size:14px;font-weight:600">${i.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${i.id},1)">+</button>
+        </div>
+      </div>
+      <button class="cart-item-remove" onclick="removeFromCart(${i.id})">✕</button>
+    </div>`).join('');
+}
+
+function changeQty(id,d){const i=cart.find(x=>x.id===id);if(!i)return;i.qty+=d;if(i.qty<=0)removeFromCart(id);else updateCartUI();}
+function removeFromCart(id){cart=cart.filter(x=>x.id!==id);updateCartUI();}
+function toggleCart(){document.getElementById('cartOverlay').classList.toggle('open');document.getElementById('cartPanel').classList.toggle('open');}
+function goCheckout(){if(!cart.length){showToast('Cart is empty','error');return;}toggleCart();showPage('checkout');}
+
+async function renderCheckout() {
+  const lines = document.getElementById('checkoutLines');
+  const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+  lines.innerHTML = cart.map(i=>`<div class="order-line"><span>${i.name} ×${i.qty}</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>`).join('') +
+    `<div class="order-line"><span>Total</span><span style="color:var(--red)">$${total.toFixed(2)}</span></div>`;
+  const mount = document.getElementById('stripeCardMount');
+  // Fetch publishable key from backend if BACKEND_URL is set
+  let pk = stripeKeys.pk;
+  if(BACKEND_URL && !pk) {
+    try {
+      const res = await fetch(BACKEND_URL+'/config');
+      const cfg = await res.json();
+      pk = cfg.publishableKey;
+      if(pk) { stripeKeys.pk = pk; localStorage.setItem('acStripe', JSON.stringify(stripeKeys)); }
+    } catch(e) { console.warn('Could not fetch Stripe config from backend'); }
+  }
+  if(pk) {
+    try {
+      const stripe = Stripe(pk);
+      const elements = stripe.elements();
+      const card = elements.create('card',{style:{base:{iconColor:'#F5F4F0',color:'#F5F4F0',fontFamily:'DM Sans,sans-serif',fontSize:'14px','::placeholder':{color:'#7A7A7A'}},invalid:{color:'#D0251A'}}});
+      mount.innerHTML = '<div style="background:var(--dark);border:1px solid var(--steel);border-radius:6px;padding:14px 16px;" id="cardEl"></div>';
+      card.mount('#cardEl');
+      window._stripeCard = card;
+      window._stripe = stripe;
+    } catch(e){ mount.innerHTML='<p style="font-size:13px;color:var(--gray)">⚠️ Invalid Stripe key or backend not connected.</p>'; }
+  } else {
+    mount.innerHTML = '<div style="background:rgba(208,37,26,0.08);border:1px dashed rgba(208,37,26,0.4);border-radius:6px;padding:14px 16px;font-size:13px;color:var(--gray)">💳 Card element will appear here once your backend URL is saved in Admin → Stripe Settings</div>';
+  }
+}
+
+async function handleCheckout() {
+  const name = document.getElementById('chkName').value.trim();
+  const email = document.getElementById('chkEmail').value.trim();
+  if(!name||!email){showToast('Please fill in your name and email','error');return;}
+  if(!BACKEND_URL){showToast('Backend URL not set. Go to Admin → Stripe Settings','error');return;}
+  if(!window._stripe||!window._stripeCard){showToast('Payment form not ready. Please wait...','error');return;}
+  const btn = document.getElementById('payBtn');
+  btn.textContent = 'Processing...';
+  btn.disabled = true;
+  try {
+    const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
+    // Step 1: Create PaymentIntent on our backend
+    const intentRes = await fetch(BACKEND_URL+'/create-payment-intent', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({amount: total, currency:'usd', customerEmail:email, customerName:name, items:cart})
+    });
+    const intentData = await intentRes.json();
+    if(intentData.error){showToast('Server error: '+intentData.error,'error');btn.textContent='PAY NOW';btn.disabled=false;return;}
+    // Step 2: Confirm payment with Stripe
+    const {error, paymentIntent} = await window._stripe.confirmCardPayment(intentData.clientSecret, {
+      payment_method: { card: window._stripeCard, billing_details: {name, email} }
+    });
+    if(error){showToast(error.message,'error');btn.textContent='PAY NOW';btn.disabled=false;return;}
+    if(paymentIntent.status==='succeeded') {
+      showToast('Payment successful! Thank you for your order.','success');
+      cart=[];updateCartUI();
+      setTimeout(()=>showPage('shop'),3000);
+    }
+  } catch(e){showToast('Payment error: '+e.message,'error');}
+  btn.textContent='PAY NOW';btn.disabled=false;
+}
+
+// ADMIN
+function doLogin(){
+  const u=document.getElementById('adminUser').value;
+  const p=document.getElementById('adminPass').value;
+  if(u==='admin'&&p==='admin123'){
+    document.getElementById('adminLogin').style.display='none';
+    document.getElementById('adminDashboard').style.display='block';
+    renderAdminStats();renderAdminTable();renderDashRecent();
+  } else { showToast('Invalid credentials','error'); }
+}
+function doLogout(){document.getElementById('adminLogin').style.display='block';document.getElementById('adminDashboard').style.display='none';}
+
+function showAdminTab(tab, el) {
+  document.querySelectorAll('[id^="tab-"]').forEach(x=>x.style.display='none');
+  document.getElementById('tab-'+tab).style.display='block';
+  document.querySelectorAll('.sidebar-item').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  currentAdminTab=tab;
+  if(tab==='dashboard'){renderAdminStats();renderDashRecent();}
+  if(tab==='products'){renderAdminTable();}
+  if(tab==='stripe'){loadStripeUI();}
+}
+
+function renderAdminStats(){
+  const cats=new Set(products.map(p=>p.cat));
+  const inStock=products.filter(p=>p.stock==='in').length;
+  const avg=products.length?products.reduce((s,p)=>s+parseFloat(p.price),0)/products.length:0;
+  document.getElementById('statProducts').textContent=products.length;
+  document.getElementById('statCats').textContent=cats.size;
+  document.getElementById('statStock').textContent=inStock;
+  document.getElementById('statAvg').textContent='$'+avg.toFixed(0);
+}
+
+function renderDashRecent(){
+  const recent=products.slice(-5).reverse();
+  document.getElementById('dashRecentTable').innerHTML=recent.map(p=>`
+    <tr><td class="td-emoji">${p.emoji||'🔧'}</td><td>${p.name}</td><td><span class="td-cat">${p.cat}</span></td><td class="td-price">$${parseFloat(p.price).toFixed(2)}</td>
+    <td><span class="product-stock ${p.stock==='in'?'in-stock':'out-stock'}">${p.stock==='in'?'In Stock':'Out of Stock'}</span></td></tr>`).join('');
+}
+
+function renderAdminTable(){
+  const search=(document.getElementById('adminSearch')?.value||'').toLowerCase();
+  let filtered=products.filter(p=>!search||p.name.toLowerCase().includes(search)||p.cat.toLowerCase().includes(search));
+  document.getElementById('adminProductTable').innerHTML=filtered.map(p=>`
+    <tr><td class="td-emoji">${p.emoji||'🔧'}</td><td style="font-weight:500">${p.name}</td>
+    <td><span class="td-cat">${p.cat}</span></td><td class="td-price">$${parseFloat(p.price).toFixed(2)}</td>
+    <td><span class="product-stock ${p.stock==='in'?'in-stock':'out-stock'}">${p.stock==='in'?'In Stock':'Out of Stock'}</span></td>
+    <td><div class="action-btns"><button class="btn-edit" onclick="openProductModal(${p.id})">Edit</button><button class="btn-delete" onclick="deleteProduct(${p.id})">Delete</button></div></td></tr>`).join('');
+  renderAdminStats();
+}
+
+function openProductModal(id=null){
+  editId=id;
+  const modal=document.getElementById('productModal');
+  const picker=document.getElementById('emojiPicker');
+  picker.innerHTML=EMOJIS.map(e=>`<span class="emoji-opt${selectedEmoji===e?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
+  if(id){
+    const p=products.find(x=>x.id===id);
+    if(!p)return;
+    document.getElementById('modalTitle').textContent='EDIT PRODUCT';
+    document.getElementById('pName').value=p.name;
+    document.getElementById('pCat').value=p.cat;
+    document.getElementById('pDesc').value=p.desc;
+    document.getElementById('pPrice').value=p.price;
+    document.getElementById('pStock').value=p.stock;
+    selectedEmoji=p.emoji||'🔧';
+    picker.innerHTML=EMOJIS.map(e=>`<span class="emoji-opt${selectedEmoji===e?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
+  } else {
+    document.getElementById('modalTitle').textContent='ADD PRODUCT';
+    document.getElementById('pName').value='';document.getElementById('pCat').value='Brakes';document.getElementById('pDesc').value='';document.getElementById('pPrice').value='';document.getElementById('pStock').value='in';
+    selectedEmoji='🔧';
+  }
+  modal.classList.add('open');
+}
+
+function selectEmoji(e){selectedEmoji=e;document.querySelectorAll('.emoji-opt').forEach(x=>x.classList.toggle('selected',x.textContent===e));}
+function closeModal(){document.getElementById('productModal').classList.remove('open');}
+
+function saveProduct(){
+  const name=document.getElementById('pName').value.trim();
+  const price=parseFloat(document.getElementById('pPrice').value);
+  if(!name||isNaN(price)||price<0){showToast('Please fill all required fields','error');return;}
+  const product={name,cat:document.getElementById('pCat').value,desc:document.getElementById('pDesc').value,price,emoji:selectedEmoji,stock:document.getElementById('pStock').value};
+  if(editId){
+    const idx=products.findIndex(x=>x.id===editId);
+    products[idx]={...product,id:editId};
+    showToast('Product updated!','success');
+  } else {
+    product.id=Date.now();
+    products.push(product);
+    showToast('Product added!','success');
+  }
+  saveProducts();closeModal();renderAdminTable();renderDashRecent();
+}
+
+function deleteProduct(id){
+  if(!confirm('Delete this product?'))return;
+  products=products.filter(x=>x.id!==id);
+  saveProducts();renderAdminTable();renderDashRecent();
+  showToast('Product deleted','success');
+}
+
+function loadStripeUI(){
+  document.getElementById('stripePkInput').value=stripeKeys.pk||'';
+  document.getElementById('stripeSkInput').value=stripeKeys.sk||'';
+  document.getElementById('backendUrlInput').value=BACKEND_URL||'';
+  document.getElementById('stripeStatus').innerHTML=(BACKEND_URL&&stripeKeys.pk)?'<span class="badge-connected"><span class="badge-dot"></span>Connected</span>':'';
+}
+
+function saveStripeKeys(){
+  stripeKeys={pk:document.getElementById('stripePkInput').value.trim(),sk:document.getElementById('stripeSkInput').value.trim()};
+  BACKEND_URL=document.getElementById('backendUrlInput').value.trim().replace(/\/$/,'');
+  localStorage.setItem('acStripe',JSON.stringify(stripeKeys));
+  localStorage.setItem('acBackendUrl',BACKEND_URL);
+  loadStripeUI();showToast('Settings saved!','success');
+}
+
+function showToast(msg,type='success'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show '+type;
+  setTimeout(()=>t.className='toast',3200);
+}
+
+renderProducts();
+
+// Show admin page when accessed via raresautoexp.com/admin
+if (window.location.pathname === '/admin') showPage('admin');
+</script>
+</body>
+</html>
