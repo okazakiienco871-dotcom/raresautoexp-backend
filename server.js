@@ -1,14 +1,15 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-
+ 
 const app = express();
-
+ 
 // Allow requests from your website domain
 const allowedOrigins = process.env.ALLOWED_ORIGIN
   ? [process.env.ALLOWED_ORIGIN]
   : ['http://localhost', 'http://127.0.0.1'];
-
+ 
 app.use(cors({
   origin: function(origin, callback) {
     // Allow requests with no origin (like mobile apps or curl)
@@ -19,23 +20,36 @@ app.use(cors({
     callback(new Error('Not allowed by CORS'));
   }
 }));
-
+ 
 app.use(express.json());
-
-// Health check endpoint
-app.get('/', (req, res) => {
-  res.json({ status: 'AutoCore Payments Server running', ok: true });
+ 
+// Serve static files from /public folder (your index.html lives here)
+app.use(express.static(path.join(__dirname, 'public')));
+ 
+// Health check endpoint (API only)
+app.get('/health', (req, res) => {
+  res.json({ status: 'Rares Auto Export payment server running', ok: true });
 });
-
+ 
+// Serve the main site at /
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+ 
+// Serve the admin panel at /admin (same HTML file, JS detects the path)
+app.get('/admin', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+ 
 // Create a PaymentIntent
 app.post('/create-payment-intent', async (req, res) => {
   try {
     const { amount, currency = 'usd', customerEmail, customerName, items } = req.body;
-
+ 
     if (!amount || amount <= 0) {
       return res.status(400).json({ error: 'Invalid amount' });
     }
-
+ 
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // Convert dollars to cents
       currency,
@@ -46,19 +60,19 @@ app.post('/create-payment-intent', async (req, res) => {
         itemSummary: items ? items.map(i => `${i.name} x${i.qty}`).join(', ').substring(0, 500) : ''
       }
     });
-
+ 
     res.json({ clientSecret: paymentIntent.client_secret });
   } catch (err) {
     console.error('PaymentIntent error:', err);
     res.status(500).json({ error: err.message });
   }
 });
-
+ 
 // Get Stripe publishable key (safe to expose)
 app.get('/config', (req, res) => {
   res.json({ publishableKey: process.env.STRIPE_PUBLISHABLE_KEY });
 });
-
+ 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Rares Auto Export payment server running on port ${PORT}`);
