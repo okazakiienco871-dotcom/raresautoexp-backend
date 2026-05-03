@@ -783,7 +783,7 @@
     <div class="form-group">
       <label>Product Photos (max 5)</label>
       <div class="photo-upload-grid" id="photoUploadGrid"></div>
-      <input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="handleProductPhotoUpload(event)">
+      <input type="file" id="photoFileInput" accept="image/*" multiple style="display:none">
     </div>
     <!-- Fallback emoji if no photos -->
     <div class="form-group" id="emojiPickerWrap">
@@ -1422,16 +1422,27 @@ function renderModalPhotos(){
       <button class="photo-thumb-del" onclick="removeModalPhoto(${i})">✕</button>
     </div>`).join('');
   if(modalPhotos.length < 5){
-    html+=`<button class="photo-add-btn" onclick="document.getElementById('photoFileInput').click()" title="Add photo">+</button>`;
+    html+=`<button class="photo-add-btn" onclick="triggerPhotoUpload()" title="Add photo">+</button>`;
   }
   grid.innerHTML=html;
+}
+
+function triggerPhotoUpload(){
+  const fi=document.getElementById('photoFileInput');
+  fi.value='';
+  // Remove any existing listener to avoid stacking
+  fi.onchange=null;
+  fi.onchange=function(e){
+    fi.onchange=null;
+    handleProductPhotoUpload(e);
+  };
+  fi.click();
 }
 
 function handleProductPhotoUpload(e){
   const files=Array.from(e.target.files);
   const slots=5-modalPhotos.length;
   const toLoad=files.slice(0,slots);
-  e.target.value='';
   if(toLoad.length===0)return;
   let loaded=0;
   toLoad.forEach(file=>{
@@ -1454,7 +1465,7 @@ function selectEmoji(e){selectedEmoji=e;document.querySelectorAll('.emoji-opt').
 function closeModal(){
   document.getElementById('productModal').classList.remove('open');
   const fi=document.getElementById('photoFileInput');
-  if(fi) fi.value='';
+  if(fi){ fi.onchange=null; fi.value=''; }
 }
 
 function saveProduct(andReturn){
@@ -1479,10 +1490,10 @@ function saveProduct(andReturn){
     products.push(product);
     showToast('Product added!','success');
   }
+  closeModal();
   saveProducts();
   renderAdminTable();
   renderDashRecent();
-  closeModal();
   if(andReturn){
     setTimeout(function(){
       const productsTabBtn = Array.from(document.querySelectorAll('.sidebar-item'))
