@@ -845,7 +845,15 @@ if (products.length === 0) {
   saveProducts();
 }
 
-function saveProducts() { localStorage.setItem('acProducts', JSON.stringify(products)); }
+function saveProducts() {
+  try {
+    localStorage.setItem('acProducts', JSON.stringify(products));
+    return true;
+  } catch(e) {
+    showToast('Storage full — photos too large. Try smaller images.','error');
+    return false;
+  }
+}
 function saveHeroImages() { localStorage.setItem('acHeroImages', JSON.stringify(heroImages)); }
 
 // ============================================================
@@ -1468,10 +1476,44 @@ function closeModal(){
   if(fi){ fi.onchange=null; fi.value=''; }
 }
 
+function compressPhoto(base64, maxW, maxH, quality, cb){
+  const img=new Image();
+  img.onload=function(){
+    const canvas=document.createElement('canvas');
+    let w=img.width, h=img.height;
+    if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+    if(h>maxH){w=Math.round(w*maxH/h);h=maxH;}
+    canvas.width=w; canvas.height=h;
+    canvas.getContext('2d').drawImage(img,0,0,w,h);
+    cb(canvas.toDataURL('image/jpeg', quality));
+  };
+  img.src=base64;
+}
+
 function saveProduct(andReturn){
   const name=document.getElementById('pName').value.trim();
   const price=parseFloat(document.getElementById('pPrice').value);
   if(!name||isNaN(price)||price<0){showToast('Please fill all required fields','error');return false;}
+
+  // Compress photos then save
+  const rawPhotos=[...modalPhotos];
+  if(rawPhotos.length===0){
+    _doSaveProduct(andReturn, name, price, []);
+    return true;
+  }
+  let done=0;
+  const compressed=[];
+  rawPhotos.forEach((src,i)=>{
+    compressPhoto(src,800,600,0.7,function(result){
+      compressed[i]=result;
+      done++;
+      if(done===rawPhotos.length) _doSaveProduct(andReturn, name, price, compressed);
+    });
+  });
+  return true;
+}
+
+function _doSaveProduct(andReturn, name, price, photos){
   const product={
     name,
     cat:document.getElementById('pCat').value,
@@ -1479,7 +1521,7 @@ function saveProduct(andReturn){
     price,
     emoji:selectedEmoji,
     stock:document.getElementById('pStock').value,
-    photos:[...modalPhotos]
+    photos:photos
   };
   if(editId){
     const idx=products.findIndex(x=>x.id===editId);
@@ -1490,18 +1532,23 @@ function saveProduct(andReturn){
     products.push(product);
     showToast('Product added!','success');
   }
+  const ok=saveProducts();
+  if(!ok){
+    // Roll back the in-memory change
+    if(editId){ const idx=products.findIndex(x=>x.id===editId); if(idx>-1) products.splice(idx,1); }
+    else products.pop();
+    return;
+  }
   closeModal();
-  saveProducts();
   renderAdminTable();
   renderDashRecent();
   if(andReturn){
     setTimeout(function(){
-      const productsTabBtn = Array.from(document.querySelectorAll('.sidebar-item'))
-        .find(el => el.getAttribute('onclick') && el.getAttribute('onclick').includes("'products'"));
-      if(productsTabBtn) showAdminTab('products', productsTabBtn);
-    }, 50);
+      const productsTabBtn=Array.from(document.querySelectorAll('.sidebar-item'))
+        .find(el=>el.getAttribute('onclick')&&el.getAttribute('onclick').includes("'products'"));
+      if(productsTabBtn) showAdminTab('products',productsTabBtn);
+    },50);
   }
-  return true;
 }
 
 function saveProductAndReturn(){
