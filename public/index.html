@@ -22,59 +22,95 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: 'DM Sans', sans-serif; background: var(--black); color: var(--white); min-height: 100vh; }
 
-  /* NAV */
-  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 40px; height: 64px; background: var(--dark); border-bottom: 1px solid var(--steel); position: sticky; top: 0; z-index: 100; }
+  /* ===================== NAV ===================== */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 64px; background: var(--dark);
+    border-bottom: 1px solid var(--steel); position: sticky; top: 0; z-index: 100;
+  }
   .nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; color: var(--red); cursor: pointer; }
   .nav-logo span { color: var(--white); }
   .nav-links { display: flex; gap: 32px; align-items: center; }
   .nav-links a { color: var(--gray); text-decoration: none; font-size: 14px; font-weight: 500; letter-spacing: 0.5px; cursor: pointer; transition: color 0.2s; }
   .nav-links a:hover, .nav-links a.active { color: var(--white); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
   .nav-cart { background: var(--red); color: #fff; border: none; padding: 8px 20px; border-radius: 4px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 8px; }
   .nav-cart:hover { background: var(--red-dark); }
   .cart-count { background: var(--white); color: var(--red); border-radius: 50%; width: 18px; height: 18px; font-size: 11px; display: flex; align-items: center; justify-content: center; font-weight: 700; }
+  .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+  .hamburger span { display: block; width: 22px; height: 2px; background: var(--white); border-radius: 2px; transition: all 0.3s; }
+  .mobile-menu { display: none; position: fixed; top: 64px; left: 0; right: 0; background: var(--dark); border-bottom: 1px solid var(--steel); z-index: 99; padding: 16px 20px; flex-direction: column; gap: 4px; }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a { color: var(--gray); text-decoration: none; font-size: 15px; font-weight: 500; padding: 12px 0; border-bottom: 1px solid var(--mid); cursor: pointer; transition: color 0.2s; }
+  .mobile-menu a:last-child { border-bottom: none; }
+  .mobile-menu a:hover, .mobile-menu a.active { color: var(--white); }
 
-  /* PAGES */
+  /* ===================== PAGES ===================== */
   .page { display: none; }
   .page.active { display: block; }
 
-  /* HERO */
-  .hero { height: 520px; background: var(--dark); display: flex; align-items: center; position: relative; overflow: hidden; padding: 0 80px; }
-  .hero::before { content: ''; position: absolute; right: -100px; top: -100px; width: 700px; height: 700px; background: radial-gradient(circle, rgba(208,37,26,0.08) 0%, transparent 70%); }
-  .hero-stripe { position: absolute; left: 0; top: 0; width: 6px; height: 100%; background: var(--red); }
-  .hero-content { max-width: 560px; }
+  /* ===================== HERO SLIDESHOW ===================== */
+  .hero { height: 520px; background: var(--dark); position: relative; overflow: hidden; }
+  .hero-slides { display: flex; height: 100%; transition: transform 0.6s cubic-bezier(0.4,0,0.2,1); }
+  .hero-slide { min-width: 100%; height: 100%; position: relative; flex-shrink: 0; }
+  .hero-slide-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .hero-slide-placeholder { width: 100%; height: 100%; background: var(--dark); display: flex; align-items: center; justify-content: center; }
+  .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to right, rgba(14,14,14,0.82) 0%, rgba(14,14,14,0.4) 60%, transparent 100%); pointer-events: none; }
+  .hero-stripe { position: absolute; left: 0; top: 0; width: 6px; height: 100%; background: var(--red); z-index: 2; }
+  .hero-content { position: absolute; top: 50%; left: 80px; transform: translateY(-50%); max-width: 560px; z-index: 3; }
   .hero-eyebrow { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--red); font-weight: 600; margin-bottom: 16px; }
   .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: 88px; line-height: 0.9; letter-spacing: 2px; margin-bottom: 24px; }
   .hero-title span { color: var(--red); }
   .hero-sub { color: var(--gray); font-size: 16px; line-height: 1.6; margin-bottom: 36px; max-width: 420px; }
-  .hero-cta { display: flex; gap: 12px; }
+  .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
   .btn-primary { background: var(--red); color: #fff; border: none; padding: 14px 32px; font-size: 15px; font-weight: 600; letter-spacing: 0.5px; cursor: pointer; border-radius: 4px; transition: background 0.2s; }
   .btn-primary:hover { background: var(--red-dark); }
   .btn-outline { background: transparent; color: var(--white); border: 1px solid var(--steel); padding: 14px 32px; font-size: 15px; font-weight: 500; cursor: pointer; border-radius: 4px; transition: all 0.2s; }
   .btn-outline:hover { border-color: var(--white); }
+  /* Hero nav arrows */
+  .hero-nav { position: absolute; bottom: 24px; right: 32px; display: flex; gap: 8px; z-index: 4; }
+  .hero-nav button { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--white); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 16px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+  .hero-nav button:hover { background: var(--red); border-color: var(--red); }
+  .hero-dots { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 4; }
+  .hero-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3); cursor: pointer; transition: all 0.2s; border: none; }
+  .hero-dot.active { background: var(--red); width: 24px; border-radius: 4px; }
+  /* Hero empty state */
+  .hero-empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 3; }
 
-  /* STATS BAR */
-  .stats-bar { background: var(--red); padding: 16px 80px; display: flex; gap: 60px; }
+  /* ===================== STATS BAR ===================== */
+  .stats-bar { background: var(--red); padding: 16px 80px; display: flex; gap: 60px; flex-wrap: wrap; }
   .stat { display: flex; flex-direction: column; }
   .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1px; }
   .stat-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; opacity: 0.8; }
 
-  /* SECTION */
+  /* ===================== SECTION ===================== */
   .section { padding: 80px; }
-  .section-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 48px; }
+  .section-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 48px; flex-wrap: wrap; gap: 16px; }
   .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 2px; }
   .section-title span { color: var(--red); }
   .section-sub { color: var(--gray); font-size: 14px; }
 
-  /* CATEGORY FILTER */
+  /* ===================== FILTER ===================== */
   .filter-bar { display: flex; gap: 8px; margin-bottom: 40px; flex-wrap: wrap; }
   .filter-btn { background: transparent; border: 1px solid var(--steel); color: var(--gray); padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
   .filter-btn:hover, .filter-btn.active { background: var(--red); border-color: var(--red); color: #fff; }
 
-  /* PRODUCT GRID */
+  /* ===================== PRODUCT GRID ===================== */
   .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
-  .product-card { background: var(--dark); border: 1px solid var(--steel); border-radius: 8px; overflow: hidden; transition: transform 0.2s, border-color 0.2s; cursor: pointer; }
+  .product-card { background: var(--dark); border: 1px solid var(--steel); border-radius: 8px; overflow: hidden; transition: transform 0.2s, border-color 0.2s; cursor: pointer; position: relative; }
   .product-card:hover { transform: translateY(-4px); border-color: var(--red); }
-  .product-img { width: 100%; height: 200px; object-fit: cover; background: var(--mid); display: flex; align-items: center; justify-content: center; font-size: 60px; }
+  .product-img-wrap { width: 100%; height: 200px; background: var(--mid); position: relative; overflow: hidden; }
+  .product-img-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .product-img-emoji { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 60px; }
+  /* Gallery mini-arrows */
+  .gallery-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); border: none; color: #fff; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 12px; display: none; align-items: center; justify-content: center; z-index: 5; transition: background 0.2s; }
+  .gallery-arrow:hover { background: var(--red); }
+  .gallery-arrow.left { left: 6px; }
+  .gallery-arrow.right { right: 6px; }
+  .product-card:hover .gallery-arrow { display: flex; }
+  .product-img-dots { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; z-index: 4; }
+  .product-img-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.4); border: none; cursor: pointer; padding: 0; }
+  .product-img-dot.active { background: #fff; }
   .product-info { padding: 16px; }
   .product-cat { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--red); font-weight: 600; margin-bottom: 6px; }
   .product-name { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
@@ -85,7 +121,42 @@
   .add-cart-btn:hover { background: var(--red-dark); }
   .no-products { text-align: center; padding: 80px; color: var(--gray); grid-column: 1 / -1; }
 
-  /* CART PANEL */
+  /* ===================== PRODUCT PAGE ===================== */
+  #productPage { min-height: 100vh; }
+  .product-page-inner { max-width: 1100px; margin: 0 auto; padding: 60px 40px; }
+  .product-page-back { display: inline-flex; align-items: center; gap: 8px; color: var(--gray); font-size: 13px; cursor: pointer; margin-bottom: 40px; background: none; border: none; transition: color 0.2s; }
+  .product-page-back:hover { color: var(--white); }
+  .product-page-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: start; }
+  /* Product page slideshow */
+  .product-slideshow { position: relative; border-radius: 12px; overflow: hidden; background: var(--dark); aspect-ratio: 4/3; }
+  .product-slideshow-track { display: flex; height: 100%; transition: transform 0.45s cubic-bezier(0.4,0,0.2,1); }
+  .product-slideshow-slide { min-width: 100%; height: 100%; flex-shrink: 0; }
+  .product-slideshow-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .product-slideshow-emoji { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 100px; }
+  .ps-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; z-index: 5; transition: all 0.2s; }
+  .ps-arrow:hover { background: var(--red); border-color: var(--red); }
+  .ps-arrow.left { left: 12px; }
+  .ps-arrow.right { right: 12px; }
+  .ps-dots { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; z-index: 4; }
+  .ps-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.35); border: none; cursor: pointer; transition: all 0.2s; }
+  .ps-dot.active { background: #fff; width: 20px; border-radius: 4px; }
+  .ps-thumbs { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+  .ps-thumb { width: 64px; height: 48px; border-radius: 6px; overflow: hidden; cursor: pointer; border: 2px solid transparent; transition: border-color 0.2s; flex-shrink: 0; background: var(--mid); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .ps-thumb.active { border-color: var(--red); }
+  .ps-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  /* Product page info */
+  .pp-cat { font-size: 12px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--red); font-weight: 600; margin-bottom: 10px; }
+  .pp-name { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 2px; line-height: 1; margin-bottom: 16px; }
+  .pp-price { font-family: 'Bebas Neue', sans-serif; font-size: 40px; color: var(--red); letter-spacing: 1px; margin-bottom: 20px; }
+  .pp-stock { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; letter-spacing: 0.5px; padding: 5px 12px; border-radius: 4px; margin-bottom: 24px; }
+  .pp-stock.in { background: rgba(99,173,84,0.12); color: #7fd171; }
+  .pp-stock.out { background: rgba(208,37,26,0.12); color: var(--red); }
+  .pp-desc { font-size: 15px; color: var(--gray); line-height: 1.75; margin-bottom: 32px; }
+  .pp-add-btn { width: 100%; background: var(--red); color: #fff; border: none; padding: 16px; font-size: 16px; font-weight: 700; border-radius: 6px; cursor: pointer; letter-spacing: 0.5px; transition: background 0.2s; }
+  .pp-add-btn:hover { background: var(--red-dark); }
+  .pp-add-btn:disabled { background: var(--steel); cursor: not-allowed; }
+
+  /* ===================== CART PANEL ===================== */
   .cart-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; }
   .cart-overlay.open { display: block; }
   .cart-panel { position: fixed; right: 0; top: 0; bottom: 0; width: 420px; background: var(--dark); border-left: 1px solid var(--steel); z-index: 201; display: flex; flex-direction: column; transform: translateX(100%); transition: transform 0.3s; }
@@ -95,7 +166,8 @@
   .cart-close { background: none; border: none; color: var(--gray); font-size: 24px; cursor: pointer; line-height: 1; }
   .cart-items { flex: 1; overflow-y: auto; padding: 16px; }
   .cart-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--mid); }
-  .cart-item-emoji { width: 56px; height: 56px; background: var(--mid); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+  .cart-item-thumb { width: 56px; height: 56px; background: var(--mid); border-radius: 6px; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+  .cart-item-thumb img { width: 100%; height: 100%; object-fit: cover; }
   .cart-item-info { flex: 1; }
   .cart-item-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
   .cart-item-price { font-size: 13px; color: var(--red); font-weight: 600; }
@@ -110,7 +182,7 @@
   .empty-cart { text-align: center; padding: 60px 20px; color: var(--gray); }
   .empty-cart .icon { font-size: 48px; margin-bottom: 12px; }
 
-  /* ADMIN */
+  /* ===================== ADMIN ===================== */
   #adminPage { background: #0A0A0A; min-height: 100vh; }
   .admin-login { max-width: 400px; margin: 0 auto; padding: 100px 20px; }
   .admin-login h2 { font-family: 'Bebas Neue', sans-serif; font-size: 40px; letter-spacing: 2px; margin-bottom: 8px; }
@@ -130,7 +202,7 @@
   .sidebar-item.active { color: var(--white); border-left-color: var(--red); background: rgba(208,37,26,0.06); }
   .sidebar-icon { font-size: 16px; width: 20px; text-align: center; }
   .admin-content { padding: 40px; overflow-y: auto; }
-  .admin-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+  .admin-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; flex-wrap: wrap; gap: 12px; }
   .admin-topbar h1 { font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 2px; }
   .admin-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px; }
   .admin-stat { background: var(--dark); border: 1px solid var(--steel); border-radius: 8px; padding: 20px; }
@@ -138,15 +210,16 @@
   .admin-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--white); letter-spacing: 1px; }
   .admin-stat-val.red { color: var(--red); }
 
-  .admin-table-wrap { background: var(--dark); border: 1px solid var(--steel); border-radius: 8px; overflow: hidden; }
-  .admin-table-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--steel); }
+  .admin-table-wrap { background: var(--dark); border: 1px solid var(--steel); border-radius: 8px; overflow: hidden; overflow-x: auto; }
+  .admin-table-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--steel); flex-wrap: wrap; gap: 10px; }
   .admin-table-header h3 { font-size: 15px; font-weight: 600; }
-  table { width: 100%; border-collapse: collapse; }
+  table { width: 100%; border-collapse: collapse; min-width: 500px; }
   th { background: rgba(255,255,255,0.02); padding: 12px 16px; text-align: left; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray); font-weight: 600; border-bottom: 1px solid var(--steel); }
   td { padding: 14px 16px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.04); vertical-align: middle; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: rgba(255,255,255,0.02); }
-  .td-emoji { font-size: 24px; }
+  .td-thumb { width: 48px; height: 36px; border-radius: 4px; overflow: hidden; background: var(--mid); display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .td-thumb img { width: 100%; height: 100%; object-fit: cover; }
   .td-price { font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: var(--red); letter-spacing: 1px; }
   .td-cat { background: rgba(208,37,26,0.15); color: var(--red); font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; display: inline-block; font-weight: 600; }
   .action-btns { display: flex; gap: 8px; }
@@ -155,10 +228,20 @@
   .btn-delete { background: rgba(208,37,26,0.1); color: var(--red); border: 1px solid rgba(208,37,26,0.3); padding: 6px 14px; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: 500; transition: all 0.15s; }
   .btn-delete:hover { background: rgba(208,37,26,0.2); }
 
-  /* MODAL */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 300; align-items: center; justify-content: center; }
+  /* Hero Slides Admin */
+  .hero-slides-admin { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-top: 16px; }
+  .hero-slide-admin { position: relative; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; background: var(--mid); border: 1px solid var(--steel); }
+  .hero-slide-admin img { width: 100%; height: 100%; object-fit: cover; }
+  .hero-slide-del { position: absolute; top: 6px; right: 6px; background: rgba(208,37,26,0.85); border: none; color: #fff; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+  .hero-slide-del:hover { background: var(--red); }
+  .upload-box { border: 2px dashed var(--steel); border-radius: 8px; padding: 24px; text-align: center; color: var(--gray); cursor: pointer; transition: border-color 0.2s; font-size: 14px; }
+  .upload-box:hover { border-color: var(--red); color: var(--white); }
+  .upload-box input[type=file] { display: none; }
+
+  /* ===================== MODAL ===================== */
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 300; align-items: center; justify-content: center; padding: 20px; }
   .modal-overlay.open { display: flex; }
-  .modal { background: var(--dark); border: 1px solid var(--steel); border-radius: 10px; width: 520px; max-width: 90vw; padding: 32px; max-height: 90vh; overflow-y: auto; }
+  .modal { background: var(--dark); border: 1px solid var(--steel); border-radius: 10px; width: 560px; max-width: 100%; padding: 32px; max-height: 90vh; overflow-y: auto; }
   .modal h3 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; margin-bottom: 24px; }
   .modal-footer { display: flex; gap: 12px; margin-top: 24px; }
   .modal-footer button { flex: 1; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; }
@@ -167,7 +250,15 @@
   .btn-save { background: var(--red); border: none; color: #fff; }
   .btn-save:hover { background: var(--red-dark); }
 
-  /* CHECKOUT */
+  /* Photo upload in modal */
+  .photo-upload-grid { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .photo-thumb-wrap { position: relative; width: 80px; height: 64px; border-radius: 6px; overflow: hidden; border: 1px solid var(--steel); background: var(--mid); flex-shrink: 0; }
+  .photo-thumb-wrap img { width: 100%; height: 100%; object-fit: cover; }
+  .photo-thumb-del { position: absolute; top: 2px; right: 2px; background: rgba(208,37,26,0.85); border: none; color: #fff; width: 18px; height: 18px; border-radius: 50%; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+  .photo-add-btn { width: 80px; height: 64px; border-radius: 6px; border: 2px dashed var(--steel); background: transparent; color: var(--gray); font-size: 22px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: border-color 0.2s; }
+  .photo-add-btn:hover { border-color: var(--red); color: var(--red); }
+
+  /* ===================== CHECKOUT ===================== */
   .checkout-page { max-width: 640px; margin: 0 auto; padding: 60px 40px; }
   .checkout-page h2 { font-family: 'Bebas Neue', sans-serif; font-size: 40px; letter-spacing: 2px; margin-bottom: 8px; }
   .checkout-page .sub { color: var(--gray); margin-bottom: 40px; font-size: 14px; }
@@ -176,27 +267,25 @@
   .order-line { display: flex; justify-content: space-between; padding: 8px 0; font-size: 14px; border-bottom: 1px solid var(--mid); }
   .order-line:last-child { border: none; font-weight: 600; font-size: 16px; padding-top: 12px; }
   .stripe-notice { background: rgba(99,173,84,0.1); border: 1px solid rgba(99,173,84,0.3); border-radius: 8px; padding: 16px; margin-bottom: 24px; font-size: 13px; color: #7fd171; display: flex; gap: 10px; align-items: flex-start; }
-  .payment-field { background: var(--dark); border: 1px solid var(--steel); border-radius: 6px; padding: 14px 16px; margin-bottom: 12px; font-size: 14px; color: var(--gray); cursor: pointer; transition: border-color 0.2s; }
-  .payment-field:hover { border-color: var(--gray); }
   .pay-btn { width: 100%; background: var(--red); color: #fff; border: none; padding: 16px; font-size: 16px; font-weight: 700; border-radius: 6px; cursor: pointer; letter-spacing: 0.5px; transition: background 0.2s; margin-top: 12px; }
   .pay-btn:hover { background: var(--red-dark); }
   .stripe-badge { text-align: center; margin-top: 16px; font-size: 12px; color: var(--gray); }
   .stripe-badge a { color: var(--gray); text-decoration: underline; }
 
-  /* STRIPE CONFIG */
+  /* Stripe settings */
   .stripe-config { background: var(--dark); border: 1px solid var(--steel); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
   .stripe-config h3 { font-size: 16px; font-weight: 600; margin-bottom: 6px; }
   .stripe-config p { font-size: 13px; color: var(--gray); margin-bottom: 16px; }
-  .key-display { background: var(--mid); border-radius: 4px; padding: 8px 12px; font-family: monospace; font-size: 12px; color: var(--gray); word-break: break-all; }
   .badge-connected { display: inline-flex; align-items: center; gap: 6px; background: rgba(99,173,84,0.1); border: 1px solid rgba(99,173,84,0.3); color: #7fd171; font-size: 12px; padding: 4px 10px; border-radius: 20px; }
   .badge-dot { width: 6px; height: 6px; background: #7fd171; border-radius: 50%; }
-  .toast { position: fixed; bottom: 32px; right: 32px; background: var(--dark); border: 1px solid var(--steel); border-radius: 8px; padding: 14px 20px; font-size: 14px; font-weight: 500; z-index: 500; transform: translateY(80px); opacity: 0; transition: all 0.3s; }
+
+  /* ===================== MISC ===================== */
+  .toast { position: fixed; bottom: 32px; right: 32px; background: var(--dark); border: 1px solid var(--steel); border-radius: 8px; padding: 14px 20px; font-size: 14px; font-weight: 500; z-index: 500; transform: translateY(80px); opacity: 0; transition: all 0.3s; max-width: 320px; }
   .toast.show { transform: translateY(0); opacity: 1; }
   .toast.success { border-color: rgba(99,173,84,0.5); color: #7fd171; }
   .toast.error { border-color: rgba(208,37,26,0.5); color: var(--red); }
   .search-input { background: var(--mid); border: 1px solid var(--steel); color: var(--white); padding: 9px 14px; border-radius: 6px; font-size: 13px; outline: none; width: 220px; }
   .search-input:focus { border-color: var(--red); }
-  .section-divider { height: 1px; background: var(--steel); margin: 60px 80px; }
   .img-emoji-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
   .emoji-opt { font-size: 24px; cursor: pointer; padding: 6px; border-radius: 6px; border: 2px solid transparent; transition: all 0.15s; background: var(--mid); }
   .emoji-opt:hover, .emoji-opt.selected { border-color: var(--red); background: rgba(208,37,26,0.1); }
@@ -204,8 +293,8 @@
   .in-stock { background: rgba(99,173,84,0.12); color: #7fd171; }
   .out-stock { background: rgba(208,37,26,0.12); color: var(--red); }
 
-  /* FOOTER */
-  .site-footer { background: var(--dark); border-top: 1px solid var(--steel); padding: 60px 80px 32px; margin-top: 0; }
+  /* ===================== FOOTER ===================== */
+  .site-footer { background: var(--dark); border-top: 1px solid var(--steel); padding: 60px 80px 32px; }
   .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
   .footer-brand .nav-logo { font-size: 24px; display: block; margin-bottom: 12px; cursor: default; }
   .footer-brand p { font-size: 13px; color: var(--gray); line-height: 1.7; max-width: 280px; margin-bottom: 16px; }
@@ -221,18 +310,18 @@
   .footer-bottom-links a { font-size: 12px; color: var(--gray); text-decoration: none; cursor: pointer; transition: color 0.2s; }
   .footer-bottom-links a:hover { color: var(--white); }
 
-  /* COOKIE BANNER */
+  /* ===================== COOKIE ===================== */
   .cookie-banner { position: fixed; bottom: 0; left: 0; right: 0; background: var(--dark); border-top: 1px solid var(--steel); padding: 20px 40px; display: flex; align-items: center; justify-content: space-between; gap: 24px; z-index: 1000; flex-wrap: wrap; transform: translateY(100%); transition: transform 0.4s ease; }
   .cookie-banner.show { transform: translateY(0); }
   .cookie-banner-text { font-size: 13px; color: var(--gray); line-height: 1.6; flex: 1; min-width: 240px; }
   .cookie-banner-text a { color: var(--red); text-decoration: underline; cursor: pointer; }
   .cookie-banner-btns { display: flex; gap: 10px; flex-shrink: 0; }
-  .cookie-accept { background: var(--red); color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+  .cookie-accept { background: var(--red); color: #fff; border: none; padding: 10px 24px; border-radius: 4px; font-size: 13px; font-weight: 600; cursor: pointer; }
   .cookie-accept:hover { background: var(--red-dark); }
-  .cookie-decline { background: transparent; color: var(--gray); border: 1px solid var(--steel); padding: 10px 24px; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+  .cookie-decline { background: transparent; color: var(--gray); border: 1px solid var(--steel); padding: 10px 24px; border-radius: 4px; font-size: 13px; font-weight: 500; cursor: pointer; }
   .cookie-decline:hover { border-color: var(--white); color: var(--white); }
 
-  /* LEGAL PAGES */
+  /* ===================== LEGAL ===================== */
   .legal-page { max-width: 800px; margin: 0 auto; padding: 72px 40px; }
   .legal-page h1 { font-family: 'Bebas Neue', sans-serif; font-size: 56px; letter-spacing: 2px; margin-bottom: 8px; }
   .legal-page .legal-updated { font-size: 12px; color: var(--gray); letter-spacing: 1px; margin-bottom: 48px; padding-bottom: 24px; border-bottom: 1px solid var(--steel); }
@@ -243,6 +332,54 @@
   .legal-page a { color: var(--red); text-decoration: underline; }
   .legal-back { display: inline-flex; align-items: center; gap: 8px; color: var(--gray); font-size: 13px; cursor: pointer; margin-bottom: 40px; transition: color 0.2s; background: none; border: none; }
   .legal-back:hover { color: var(--white); }
+
+  /* ===================== RESPONSIVE ===================== */
+  @media (max-width: 900px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    .hero-content { left: 32px; right: 32px; max-width: 100%; }
+    .hero-title { font-size: 56px; }
+    .hero { height: 420px; }
+    .stats-bar { padding: 16px 32px; gap: 24px; }
+    .section { padding: 48px 24px; }
+    .section-header { flex-direction: column; align-items: flex-start; }
+    .search-input { width: 100%; }
+    .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+    .site-footer { padding: 40px 24px 24px; }
+    .footer-bottom { flex-direction: column; align-items: flex-start; }
+    .admin-panel { grid-template-columns: 1fr; }
+    .admin-sidebar { display: none; }
+    .admin-content { padding: 20px; }
+    .admin-stats { grid-template-columns: repeat(2,1fr); }
+    .product-page-layout { grid-template-columns: 1fr; gap: 32px; }
+    .product-page-inner { padding: 32px 20px; }
+    .pp-name { font-size: 36px; }
+    .checkout-page { padding: 40px 20px; }
+    .cart-panel { width: 100%; }
+    .legal-page { padding: 48px 20px; }
+    .modal { padding: 20px; }
+    .cookie-banner { padding: 16px 20px; }
+  }
+  @media (max-width: 600px) {
+    .hero-title { font-size: 44px; }
+    .hero { height: 360px; }
+    .hero-content { left: 20px; right: 20px; }
+    .hero-sub { font-size: 14px; }
+    .hero-cta .btn-primary, .hero-cta .btn-outline { padding: 12px 20px; font-size: 14px; }
+    .section-title { font-size: 36px; }
+    .product-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .product-name { font-size: 14px; }
+    .product-price { font-size: 20px; }
+    .add-cart-btn { padding: 6px 10px; font-size: 12px; }
+    .stats-bar { gap: 16px; padding: 12px 20px; }
+    .stat-num { font-size: 22px; }
+    .toast { bottom: 16px; right: 16px; left: 16px; }
+    .nav-logo { font-size: 20px; }
+  }
+  @media (max-width: 400px) {
+    .product-grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
@@ -252,17 +389,31 @@
   <div class="nav-links">
     <a onclick="showPage('shop')" id="nav-shop" class="active">Shop</a>
     <a onclick="showPage('gallery')" id="nav-gallery">Gallery</a>
-    <a onclick="showPage('admin')" id="nav-admin">Admin</a>
   </div>
-  <button class="nav-cart" onclick="toggleCart()">
-    🛒 Cart <span class="cart-count" id="cartCount">0</span>
-  </button>
+  <div class="nav-right">
+    <button class="nav-cart" onclick="toggleCart()">
+      🛒 Cart <span class="cart-count" id="cartCount">0</span>
+    </button>
+    <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
 </nav>
 
-<!-- SHOP PAGE -->
+<div class="mobile-menu" id="mobileMenu">
+  <a onclick="showPage('shop');closeMobileMenu()" id="mnav-shop" class="active">Shop</a>
+  <a onclick="showPage('gallery');closeMobileMenu()" id="mnav-gallery">Gallery</a>
+</div>
+
+<!-- ==================== SHOP PAGE ==================== -->
 <div id="shopPage" class="page active">
-  <div class="hero">
+
+  <!-- HERO SLIDESHOW -->
+  <div class="hero" id="heroSection">
     <div class="hero-stripe"></div>
+    <div id="heroSlidesTrack" class="hero-slides"></div>
+    <div class="hero-overlay"></div>
+    <!-- Static content always visible -->
     <div class="hero-content">
       <div class="hero-eyebrow">Quality Parts, Worldwide Export</div>
       <div class="hero-title">RARES<br><span>AUTO EXPORT</span></div>
@@ -272,6 +423,11 @@
         <button class="btn-outline" onclick="showPage('gallery')">View Gallery</button>
       </div>
     </div>
+    <div class="hero-nav" id="heroNav" style="display:none">
+      <button onclick="heroSlide(-1)">&#8592;</button>
+      <button onclick="heroSlide(1)">&#8594;</button>
+    </div>
+    <div class="hero-dots" id="heroDots"></div>
   </div>
 
   <div class="stats-bar">
@@ -291,7 +447,7 @@
   </div>
 </div>
 
-<!-- GALLERY PAGE -->
+<!-- ==================== GALLERY PAGE ==================== -->
 <div id="galleryPage" class="page">
   <div class="section">
     <div class="section-header">
@@ -305,7 +461,33 @@
   </div>
 </div>
 
-<!-- ADMIN PAGE -->
+<!-- ==================== PRODUCT PAGE ==================== -->
+<div id="productPage" class="page">
+  <div class="product-page-inner">
+    <button class="product-page-back" id="productBackBtn" onclick="history.go(-1)">&#8592; Back</button>
+    <div class="product-page-layout">
+      <div>
+        <div class="product-slideshow" id="ppSlideshow">
+          <div class="product-slideshow-track" id="ppTrack"></div>
+          <button class="ps-arrow left" id="ppArrowL" onclick="ppSlide(-1)">&#8592;</button>
+          <button class="ps-arrow right" id="ppArrowR" onclick="ppSlide(1)">&#8594;</button>
+          <div class="ps-dots" id="ppDots"></div>
+        </div>
+        <div class="ps-thumbs" id="ppThumbs"></div>
+      </div>
+      <div>
+        <div class="pp-cat" id="ppCat"></div>
+        <div class="pp-name" id="ppName"></div>
+        <div class="pp-price" id="ppPrice"></div>
+        <div class="pp-stock" id="ppStock"></div>
+        <div class="pp-desc" id="ppDesc"></div>
+        <button class="pp-add-btn" id="ppAddBtn" onclick="ppAddToCart()">Add to Cart</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ADMIN PAGE ==================== -->
 <div id="adminPage" class="page">
   <div id="adminLogin">
     <div class="admin-login">
@@ -334,8 +516,9 @@
         <div class="admin-sidebar-title">Navigation</div>
         <div class="sidebar-item active" onclick="showAdminTab('dashboard',this)"><span class="sidebar-icon">📊</span> Dashboard</div>
         <div class="sidebar-item" onclick="showAdminTab('products',this)"><span class="sidebar-icon">🔧</span> Products</div>
+        <div class="sidebar-item" onclick="showAdminTab('hero',this)"><span class="sidebar-icon">🖼️</span> Hero Slideshow</div>
         <div class="sidebar-item" onclick="showAdminTab('stripe',this)"><span class="sidebar-icon">💳</span> Stripe Settings</div>
-        <div style="margin-top:auto;padding:20px">
+        <div style="padding:20px;margin-top:16px">
           <button onclick="doLogout()" style="width:100%;background:transparent;border:1px solid var(--steel);color:var(--gray);padding:10px;border-radius:6px;cursor:pointer;font-size:13px">Sign Out</button>
         </div>
       </div>
@@ -373,12 +556,28 @@
           </div>
         </div>
 
+        <!-- HERO SLIDESHOW TAB -->
+        <div id="tab-hero" style="display:none">
+          <div class="admin-topbar"><h1>HERO SLIDESHOW</h1></div>
+          <div class="stripe-config">
+            <h3>Homepage Slideshow Photos</h3>
+            <p style="font-size:13px;color:var(--gray);margin-bottom:16px">Upload photos that will appear in the hero section on the homepage. Recommended ratio: 16:9 or wider. Max 10 photos.</p>
+            <label class="upload-box" id="heroUploadBox">
+              <input type="file" id="heroFileInput" accept="image/*" multiple onchange="handleHeroUpload(event)">
+              <div style="font-size:28px;margin-bottom:8px">📷</div>
+              <div>Click to upload hero photos</div>
+              <div style="font-size:12px;margin-top:4px">JPG, PNG, WebP — multiple allowed</div>
+            </label>
+            <div class="hero-slides-admin" id="heroSlidesAdmin"></div>
+          </div>
+        </div>
+
         <!-- STRIPE TAB -->
         <div id="tab-stripe" style="display:none">
           <div class="admin-topbar"><h1>STRIPE SETTINGS</h1></div>
           <div class="stripe-config">
             <h3>Stripe Integration</h3>
-            <p>Connect your Stripe account to accept payments. Your keys are stored locally in this session.</p>
+            <p>Connect your Stripe account to accept payments.</p>
             <div class="form-group"><label>Backend Server URL</label><input type="text" id="backendUrlInput" placeholder="https://raresautoexp-payments.onrender.com" /></div>
             <div class="form-group"><label>Stripe Publishable Key</label><input type="text" id="stripePkInput" placeholder="pk_live_..." /></div>
             <div class="form-group"><label>Stripe Secret Key</label><input type="password" id="stripeSkInput" placeholder="sk_live_..." /></div>
@@ -389,7 +588,7 @@
           </div>
           <div class="stripe-config">
             <h3>Integration Status</h3>
-            <p>After saving your Stripe keys, payments on the checkout page will route to your Stripe account. For production, ensure you are using live keys and have HTTPS enabled.</p>
+            <p>After saving your Stripe keys, payments on the checkout page will route to your Stripe account.</p>
             <div style="font-size:13px;color:var(--gray);line-height:1.8">
               ✅ Stripe.js loaded<br>
               ✅ Payment button ready<br>
@@ -402,7 +601,7 @@
   </div>
 </div>
 
-<!-- CHECKOUT PAGE -->
+<!-- ==================== CHECKOUT PAGE ==================== -->
 <div id="checkoutPage" class="page">
   <div class="checkout-page">
     <h2>CHECKOUT</h2>
@@ -429,13 +628,12 @@
   </div>
 </div>
 
-<!-- TERMS & CONDITIONS PAGE -->
+<!-- ==================== LEGAL PAGES ==================== -->
 <div id="termsPage" class="page">
   <div class="legal-page">
     <button class="legal-back" onclick="showPage('shop')">← Back to Shop</button>
     <h1>TERMS &amp; <span style="color:var(--red)">CONDITIONS</span></h1>
     <p class="legal-updated">Last revised: February 2026 &nbsp;·&nbsp; Filed with KvK under number 98948423</p>
-
     <h2>Article 1 – Definitions</h2>
     <p>In these terms and conditions, the following definitions apply:</p>
     <ul>
@@ -443,175 +641,64 @@
       <li><strong style="color:var(--white)">Customer:</strong> the natural person who enters into an agreement with the webshop.</li>
       <li><strong style="color:var(--white)">Agreement:</strong> any order of products placed via the webshop.</li>
     </ul>
-
     <h2>Article 2 – Applicability</h2>
     <p>These general terms and conditions apply to all offers, orders and agreements between the webshop and the customer.</p>
-    <p>Deviations from these terms and conditions are only valid if expressly agreed upon in writing.</p>
-
     <h2>Article 3 – Offers and Prices</h2>
     <p>All prices displayed on the website are in euros and include VAT, unless stated otherwise.</p>
-    <p>The webshop reserves the right to correct errors in prices or product information.</p>
-
     <h2>Article 4 – Orders and Formation of the Agreement</h2>
-    <p>The customer may place orders via the webshop.</p>
     <p>The agreement is concluded at the moment the webshop has received and confirmed the customer's order.</p>
-
     <h2>Article 5 – Payment</h2>
-    <p>Payment may be made using the payment methods offered in the webshop.</p>
-    <p>Payment must be made in advance, unless stated otherwise.</p>
-
+    <p>Payment may be made using the payment methods offered in the webshop. Payment must be made in advance, unless stated otherwise.</p>
     <h2>Article 6 – Delivery and Shipping</h2>
-    <p>Our webshop delivers products within the Netherlands and, where possible, internationally.</p>
-    <p>Any delivery times stated are indicative only and do not constitute a binding delivery period. We aim to deliver products as quickly as possible.</p>
-    <p>The risk of loss or damage to the products transfers to the customer at the moment the products are delivered to the customer. The customer is expected to inspect the products upon receipt and must report any damage or defects immediately.</p>
-
+    <p>Our webshop delivers products within the Netherlands and, where possible, internationally. Any delivery times stated are indicative only. The risk transfers to the customer at the moment of delivery.</p>
     <h2>Article 7 – Right of Withdrawal (14 Days)</h2>
-    <p>Consumers have the right to withdraw from the agreement within fourteen (14) days (statutory right of withdrawal).</p>
-    <p>The withdrawal period starts on the day the customer receives the product.</p>
-    <p>The product must be returned unused and in its original condition, insofar as reasonably possible. The customer may only handle and inspect the product as would be permitted in a physical retail store. For further information, we refer to our return policy on the website.</p>
-    <p>The costs of returning the product are borne by the customer, unless stated otherwise.</p>
-    <p>After receipt of the returned product, we will refund the original purchase amount, excluding shipping costs, within fourteen (14) days using the same payment method used for the original transaction.</p>
-    <p>The right of withdrawal does not apply to specially ordered or custom-made products, or to products that can no longer be sold as new due to installation, use or damage.</p>
-
+    <p>Consumers have the right to withdraw from the agreement within fourteen (14) days of receipt. The product must be returned unused and in its original condition. The costs of returning the product are borne by the customer.</p>
     <h2>Article 8 – Complaints and Warranty</h2>
-    <p>The customer is obliged to inspect the delivered product immediately upon receipt for visible defects, damage or deviations. Any complaints regarding such issues must be reported to Rares Auto Export in writing or by e-mail as soon as possible, but no later than seven (7) days after receipt of the product.</p>
-    <p>Complaints regarding non-visible defects that become apparent only after use must be reported to Rares Auto Export within a reasonable period after discovery.</p>
-    <p>If a complaint is found to be justified, Rares Auto Export will, at its own discretion, repair or replace the product or refund (part of) the purchase price.</p>
-    <p>Rares Auto Export provides a warranty of one (1) year on its products, unless explicitly stated otherwise.</p>
-    <p>The warranty shall lapse if:</p>
-    <ul>
-      <li>the product has been used incorrectly or improperly;</li>
-      <li>the product has been installed, modified or repaired by the customer or by third parties;</li>
-      <li>the product has been used contrary to the operating or installation instructions;</li>
-      <li>the product has been used for purposes other than those for which it is intended, including use on public roads of products intended exclusively for racing or track use;</li>
-      <li>normal wear and tear is involved.</li>
-    </ul>
-    <p>The warranty covers manufacturing and material defects only and explicitly excludes damage caused by installation, adjustment, use or combination with other (tuning) parts.</p>
-    <p>The warranty provided by Rares Auto Export does not affect the statutory rights of the consumer arising from conformity as laid down in the Dutch Civil Code.</p>
-
+    <p>Rares Auto Export provides a warranty of one (1) year on its products unless explicitly stated otherwise. The warranty covers manufacturing and material defects only.</p>
     <h2>Article 9 – Privacy and Personal Data</h2>
     <p>Personal data of the customer are processed in accordance with the webshop's privacy policy.</p>
-    <p>Data are used solely for the performance of the agreement and for legally required purposes.</p>
-
-    <h2>Article 10 – Use of Products / Liability</h2>
-    <p>Rares Auto Export shall not be liable for indirect damage, consequential damage, business damage, loss of profit or any other form of indirect damage, unless such damage is caused by intent or gross negligence on the part of Rares Auto Export.</p>
-    <p>The liability of Rares Auto Export shall, to the extent permitted by law, be limited to the amount paid by the customer for the relevant product.</p>
-    <p>The limitations of liability set out in this article do not apply if and insofar as the damage is the result of intent or gross negligence of Rares Auto Export, nor in the event of personal injury or liability arising from mandatory provisions regarding product liability.</p>
-    <p>Some of the products offered by Rares Auto Export are intended exclusively for racing, track and/or sporting use and are not approved for use on public roads. These products may affect the power and/or maximum speed of the vehicle and may not comply with legal requirements for use on public roads. The customer is solely responsible at all times for the correct, legal and safe use of the vehicle and for compliance with all applicable laws and regulations.</p>
-    <p>Use of the delivered products is entirely at the customer's own risk. Rares Auto Export accepts no liability for damage, fines, seizure, rejection during inspections or any other consequences resulting from incorrect, unlawful or prohibited use of the products.</p>
-    <p>Installation, adjustment and maintenance of the delivered products are entirely at the customer's expense and risk. Rares Auto Export shall not be liable for damage caused by incorrect or improper installation or adjustment, regardless of whether such work is carried out by the customer or by third parties.</p>
-    <p>Liability of Rares Auto Export is excluded if products are used in combination with non-original parts, tuning parts or in a modified vehicle configuration.</p>
-    <p>Any installation instructions, product specifications and other information are provided for general information purposes only. No rights may be derived from such information.</p>
-    <p>The customer fully indemnifies Rares Auto Export against all third-party claims arising from the use of the delivered products, including claims for damage caused by incorrect use, installation or combination with other parts.</p>
-    <p>Rares Auto Export advises that installation and adjustment of the delivered products be carried out by a qualified or professional mechanic. Compliance with this advice is entirely the responsibility of the customer.</p>
-
-    <h2>Article 11 – Governing Law and Disputes</h2>
-    <p>All agreements are governed by Dutch law.</p>
-    <p>Disputes shall preferably be resolved by mutual consultation. If this is not possible, the dispute shall be submitted to the competent court in the Netherlands.</p>
-
-    <h2>Article 12 – Amendment and Availability of the Terms and Conditions</h2>
-    <p>These general terms and conditions have been filed with the Chamber of Commerce under number 98948423.</p>
-    <p>These terms and conditions can also be consulted on our website: <a href="https://raresautoexp.com" target="_blank">www.raresautoexp.com</a>. The most recent version of the terms and conditions applies to each agreement, or the version applicable at the time the agreement was concluded.</p>
-    <p><em>Last revised version: February 2026.</em></p>
+    <h2>Article 10 – Governing Law and Disputes</h2>
+    <p>All agreements are governed by Dutch law. Disputes shall preferably be resolved by mutual consultation.</p>
+    <h2>Article 11 – Amendment</h2>
+    <p>These general terms and conditions have been filed with the Chamber of Commerce under number 98948423. Last revised version: February 2026.</p>
   </div>
 </div>
 
-<!-- PRIVACY POLICY PAGE -->
 <div id="privacyPage" class="page">
   <div class="legal-page">
     <button class="legal-back" onclick="showPage('shop')">← Back to Shop</button>
     <h1>PRIVACY <span style="color:var(--red)">POLICY</span></h1>
     <p class="legal-updated">Last updated: February 2026</p>
-
     <h2>Who We Are</h2>
     <p>Rares Auto Export is responsible for the processing of personal data as described in this privacy statement.</p>
-
     <h2>Personal Data We Process</h2>
-    <p>Rares Auto Export processes your personal data because you use our services and/or because you provide this data to us yourself. Below is an overview of the personal data we process:</p>
-    <ul>
-      <li>First and last name</li>
-      <li>Bank account number</li>
-      <li>Address details</li>
-      <li>Telephone number</li>
-      <li>Email address</li>
-    </ul>
-
-    <h2>Special and/or Sensitive Personal Data</h2>
-    <p>Our website and/or services do not intend to collect data about website visitors who are under the age of 16, unless they have permission from their parents or legal guardian. However, we cannot verify whether a visitor is older than 16. We therefore advise parents to be involved in their children's online activities in order to prevent the collection of personal data about minors without parental consent.</p>
-    <p>If you believe that we have collected personal data about a minor without such consent, please contact us at <a href="mailto:info@raresautoexp.com">info@raresautoexp.com</a>, and we will delete this information.</p>
-
-    <h2>Purposes for Processing Personal Data</h2>
-    <p>Rares Auto Export processes your personal data for the following purposes:</p>
-    <ul>
-      <li>To process your payment</li>
-      <li>To deliver goods and services to you</li>
-    </ul>
-
-    <h2>Data Retention Period</h2>
-    <p>Rares Auto Export does not retain your personal data for longer than is strictly necessary to achieve the purposes for which the data is collected, unless a longer retention period is required by law.</p>
-
-    <h2>Sharing Personal Data with Third Parties</h2>
-    <p>Rares Auto Export only shares your personal data when this is necessary for the performance of the agreement or to comply with a legal obligation. This includes, for example, the processing of payments by a payment service provider and the shipment of orders by transport carriers.</p>
-    <p>The payment service provider processes only the data necessary to process your payment. The carrier uses the data exclusively to deliver your order.</p>
-    <p>Rares Auto Export never sells your personal data to third parties and only discloses it when this is necessary for the performance of the agreement or to comply with a legal obligation.</p>
-
-    <h2>Cookies, or Similar Techniques, That We Use</h2>
-    <p>Rares Auto Export uses only technical and functional cookies, as well as analytical cookies that do not infringe on your privacy. A cookie is a small text file that is stored on your computer, tablet, or smartphone when you first visit this website. The cookies we use are necessary for the technical operation of the website and for your ease of use. They ensure that the website functions properly and, for example, remember your preference settings. We may also use cookies to optimize our website.</p>
-    <p>You can opt out of cookies by setting your internet browser so that it no longer stores cookies. In addition, you can delete all information previously stored via your browser settings.</p>
-
-    <h2>Accessing, Correcting or Deleting Personal Data</h2>
-    <p>You have the right to access, correct or delete your personal data. In addition, you have the right to withdraw any consent you have given for the processing of your personal data or to object to the processing of your personal data by Rares Auto Export. You also have the right to data portability. This means that you may submit a request to us to send the personal data we hold about you in a computer file to you or to another organization designated by you.</p>
-
-    <h2>How We Protect Personal Data</h2>
-    <p>Rares Auto Export takes the protection of your data seriously and implements appropriate measures to prevent misuse, loss, unauthorized access, unwanted disclosure and unauthorized modification.</p>
+    <ul><li>First and last name</li><li>Bank account number</li><li>Address details</li><li>Telephone number</li><li>Email address</li></ul>
+    <h2>Purposes for Processing</h2>
+    <ul><li>To process your payment</li><li>To deliver goods and services to you</li></ul>
+    <h2>Data Retention</h2>
+    <p>Rares Auto Export does not retain your personal data for longer than is strictly necessary.</p>
+    <h2>Sharing Personal Data</h2>
+    <p>Rares Auto Export only shares your personal data when necessary for the performance of the agreement. We never sell your personal data to third parties.</p>
+    <h2>Your Rights</h2>
+    <p>You have the right to access, correct or delete your personal data. Contact us at <a href="mailto:info@raresautoexp.com">info@raresautoexp.com</a>.</p>
   </div>
 </div>
 
-<!-- RETURNS PAGE -->
 <div id="returnsPage" class="page">
   <div class="legal-page">
     <button class="legal-back" onclick="showPage('shop')">← Back to Shop</button>
     <h1>RETURNS &amp; <span style="color:var(--red)">REFUNDS</span></h1>
     <p class="legal-updated">Please read our return policy carefully before sending back any items.</p>
-
     <h2>Statutory Right of Withdrawal</h2>
-    <p>You have the statutory right to return your order within 14 days of receipt. To exercise your right of withdrawal, we ask you to follow the steps below:</p>
-    <ul>
-      <li>Register your return by sending an email to <a href="mailto:info@raresautoexp.com">info@raresautoexp.com</a>.</li>
-      <li>You will then receive a return form from us. Complete this form and print it out.</li>
-      <li>Include the completed return form with the return shipment.</li>
-      <li>Send the product to the address stated on the return form.</li>
-    </ul>
-    <p><strong style="color:var(--white)">Important:</strong> The product must be unused, undamaged, and returned in its original condition. You may only handle and inspect the product as you would be allowed to do in a physical store. Exhaust systems and other engine-related parts must not have been installed or used. Once an exhaust has been installed and/or the engine has been started, the right of withdrawal expires.</p>
-    <p>We recommend returning the product, if possible, in the original packaging or in another sturdy cardboard box.</p>
-    <p>After receipt of the return shipment, we will refund the original purchase amount minus shipping costs within 14 days, provided that we have received the complete product. The refund will be made using the same payment method used for the original transaction. The costs of return shipping are at your own expense.</p>
-
+    <p>You have the right to return your order within 14 days of receipt. Register your return by emailing <a href="mailto:info@raresautoexp.com">info@raresautoexp.com</a>. The product must be unused and in its original condition.</p>
     <h2>Incorrect or Damaged Delivery</h2>
-    <p>Despite our careful handling, it may occur that you receive an incorrect or damaged item. In this case, we ask you to report this to us immediately by email, in any event within 7 days. Please follow these steps:</p>
-    <ul>
-      <li>Register the return via <a href="mailto:info@raresautoexp.com">info@raresautoexp.com</a> and include photos of the condition of the product.</li>
-      <li>You will then receive a return form from us. Complete this form and print it out.</li>
-      <li>Include the completed return form with the return shipment.</li>
-      <li>Send the product to the address stated on the return form.</li>
-    </ul>
-    <p>After receiving the return shipment, we will inspect the product and either send a replacement item free of charge or refund the full purchase amount, including shipping costs.</p>
-
-    <h2>Complaints After Use</h2>
-    <p>If you have a complaint, please contact us via <a href="mailto:info@raresautoexp.com">info@raresautoexp.com</a>. We will handle your complaint as soon as possible.</p>
-
+    <p>Report any incorrect or damaged items within 7 days by email with photos. We will send a replacement or provide a full refund including shipping costs.</p>
     <h2>Exclusion of the Right of Withdrawal</h2>
-    <p>The right of withdrawal is excluded for:</p>
-    <ul>
-      <li>Specially ordered or custom-made parts.</li>
-      <li>Products that can no longer be sold as new due to installation, use, damage, or missing parts.</li>
-    </ul>
-
-    <h2>Privacy</h2>
-    <p>The personal data you provide when registering a return or complaint is used exclusively for the handling of that return or complaint. This data is processed in accordance with our <a onclick="showPage('privacy')" style="cursor:pointer">privacy statement</a>.</p>
+    <ul><li>Specially ordered or custom-made parts.</li><li>Products that can no longer be sold as new due to installation, use, or damage.</li></ul>
   </div>
 </div>
 
-<!-- FOOTER -->
+<!-- ==================== FOOTER ==================== -->
 <footer class="site-footer" id="siteFooter">
   <div class="footer-grid">
     <div class="footer-brand">
@@ -627,7 +714,6 @@
       <h4>Shop</h4>
       <a onclick="showPage('shop')">All Parts</a>
       <a onclick="showPage('gallery')">Gallery</a>
-      <a onclick="document.getElementById('shopSection')?.scrollIntoView({behavior:'smooth'});showPage('shop')">Browse Catalogue</a>
     </div>
     <div class="footer-col">
       <h4>Company</h4>
@@ -646,7 +732,7 @@
   </div>
 </footer>
 
-<!-- COOKIE CONSENT BANNER -->
+<!-- COOKIE BANNER -->
 <div class="cookie-banner" id="cookieBanner">
   <p class="cookie-banner-text">
     🍪 We use cookies to improve your experience and analyze site traffic. By clicking "Accept", you consent to our use of cookies as described in our <a onclick="showPage('privacy')">Privacy Policy</a>.
@@ -657,7 +743,7 @@
   </div>
 </div>
 
-
+<!-- CART -->
 <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
 <div class="cart-panel" id="cartPanel">
   <div class="cart-header"><h2>YOUR CART</h2><button class="cart-close" onclick="toggleCart()">✕</button></div>
@@ -692,13 +778,20 @@
       <div class="form-group"><label>Price ($)</label><input type="number" id="pPrice" placeholder="49.99" step="0.01" min="0"/></div>
       <div class="form-group"><label>Stock Status</label><select id="pStock"><option value="in">In Stock</option><option value="out">Out of Stock</option></select></div>
     </div>
+    <!-- Photo upload -->
     <div class="form-group">
-      <label>Icon</label>
+      <label>Product Photos (max 5)</label>
+      <div class="photo-upload-grid" id="photoUploadGrid"></div>
+      <input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="handleProductPhotoUpload(event)">
+    </div>
+    <!-- Fallback emoji if no photos -->
+    <div class="form-group" id="emojiPickerWrap">
+      <label>Fallback Icon (if no photos)</label>
       <div class="img-emoji-picker" id="emojiPicker"></div>
     </div>
     <div class="modal-footer">
-      <button class="modal-footer btn-cancel" onclick="closeModal()">Cancel</button>
-      <button class="modal-footer btn-save" onclick="saveProduct()">Save Product</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-save" onclick="saveProduct()">Save Product</button>
     </div>
   </div>
 </div>
@@ -706,152 +799,423 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ============================================================
+// DATA & STATE
+// ============================================================
 const EMOJIS = ['🔧','⚙️','🛞','💡','🔩','🪛','🔌','🛢️','🏎️','🔋','💨','🔥','❄️','🪝','⛽','🔑','🛠️','📡','🎛️','🧲'];
 const CATEGORIES = ['All','Brakes','Engine','Suspension','Electrical','Filters','Exhaust','Lighting','Transmission','Cooling','Body'];
 
 let products = JSON.parse(localStorage.getItem('acProducts') || '[]');
+let heroImages = JSON.parse(localStorage.getItem('acHeroImages') || '[]'); // array of base64 strings
 let cart = [];
 let editId = null;
 let selectedEmoji = '🔧';
-// UPDATE after deploying backend to Render.com
-// Example: 'https://raresautoexp-payments.onrender.com'
+let modalPhotos = []; // base64 photos being edited in modal
 let BACKEND_URL = localStorage.getItem('acBackendUrl') || '';
 let stripeKeys = JSON.parse(localStorage.getItem('acStripe') || '{}');
-let currentAdminTab = 'dashboard';
 
+// Hero slideshow state
+let heroIdx = 0;
+let heroTimer = null;
+
+// Gallery card photo states
+let cardPhotoIdx = {};
+
+// Product page state
+let ppProduct = null;
+let ppIdx = 0;
+let ppFromPage = 'shop';
+
+// ============================================================
+// SEED DEFAULT PRODUCTS
+// ============================================================
 if (products.length === 0) {
   products = [
-    {id:1,name:'Bosch Brake Pads',cat:'Brakes',desc:'OEM-quality ceramic brake pads for superior stopping power.',price:49.99,emoji:'🛞',stock:'in'},
-    {id:2,name:'K&N Air Filter',cat:'Filters',desc:'High-flow air filter that increases horsepower and acceleration.',price:34.99,emoji:'💨',stock:'in'},
-    {id:3,name:'Monroe Shock Absorber',cat:'Suspension',desc:'Gas-charged shock absorbers for a smooth, controlled ride.',price:79.99,emoji:'🔩',stock:'in'},
-    {id:4,name:'NGK Spark Plugs (4pk)',cat:'Engine',desc:'Iridium tip spark plugs for maximum fuel efficiency.',price:28.99,emoji:'🔥',stock:'in'},
-    {id:5,name:'Philips H7 LED Kit',cat:'Lighting',desc:'Ultra-bright LED headlight conversion kit, 6000K cool white.',price:64.99,emoji:'💡',stock:'in'},
-    {id:6,name:'Optima RedTop Battery',cat:'Electrical',desc:'High-performance AGM battery for reliable starts.',price:219.99,emoji:'🔋',stock:'out'},
+    {id:1,name:'Bosch Brake Pads',cat:'Brakes',desc:'OEM-quality ceramic brake pads for superior stopping power and reduced brake dust.',price:49.99,emoji:'🛞',stock:'in',photos:[]},
+    {id:2,name:'K&N Air Filter',cat:'Filters',desc:'High-flow air filter that increases horsepower and acceleration while protecting the engine.',price:34.99,emoji:'💨',stock:'in',photos:[]},
+    {id:3,name:'Monroe Shock Absorber',cat:'Suspension',desc:'Gas-charged shock absorbers for a smooth, controlled ride on any road surface.',price:79.99,emoji:'🔩',stock:'in',photos:[]},
+    {id:4,name:'NGK Spark Plugs (4pk)',cat:'Engine',desc:'Iridium tip spark plugs for maximum fuel efficiency and longer service life.',price:28.99,emoji:'🔥',stock:'in',photos:[]},
+    {id:5,name:'Philips H7 LED Kit',cat:'Lighting',desc:'Ultra-bright LED headlight conversion kit, 6000K cool white, plug-and-play.',price:64.99,emoji:'💡',stock:'in',photos:[]},
+    {id:6,name:'Optima RedTop Battery',cat:'Electrical',desc:'High-performance AGM battery for reliable starts in all weather conditions.',price:219.99,emoji:'🔋',stock:'out',photos:[]},
   ];
   saveProducts();
 }
 
-function saveProducts() { localStorage.setItem('acProducts',JSON.stringify(products)); }
+function saveProducts() { localStorage.setItem('acProducts', JSON.stringify(products)); }
+function saveHeroImages() { localStorage.setItem('acHeroImages', JSON.stringify(heroImages)); }
 
-function showPage(p) {
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-  document.getElementById(p+'Page').classList.add('active');
-  document.querySelectorAll('.nav-links a').forEach(x=>x.classList.remove('active'));
-  const el = document.getElementById('nav-'+p);
-  if(el) el.classList.add('active');
-  if(p==='shop') renderProducts();
+// ============================================================
+// PAGE ROUTING
+// ============================================================
+function showPage(p, fromPage) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  document.getElementById(p + 'Page').classList.add('active');
 
-// Show admin page when accessed via raresautoexp.com/admin
-  if(p==='gallery') renderGallery();
-  if(p==='admin') renderAdminTable();
-  if(p==='checkout') renderCheckout();
-  // Hide footer on admin & checkout pages
+  // Nav highlights (desktop + mobile)
+  document.querySelectorAll('.nav-links a, .mobile-menu a').forEach(x => x.classList.remove('active'));
+  ['nav-shop','nav-gallery','mnav-shop','mnav-gallery'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.classList.remove('active');
+  });
+  const navEl = document.getElementById('nav-' + p);
+  const mnavEl = document.getElementById('mnav-' + p);
+  if(navEl) navEl.classList.add('active');
+  if(mnavEl) mnavEl.classList.add('active');
+
+  // Footer visibility
   const footer = document.getElementById('siteFooter');
   if(footer) footer.style.display = (p==='admin'||p==='checkout') ? 'none' : 'block';
+
+  if(p === 'shop') renderProducts();
+  if(p === 'gallery') renderGallery();
+  if(p === 'admin') { renderAdminTable(); renderAdminStats(); renderDashRecent(); }
+  if(p === 'checkout') renderCheckout();
+  if(p === 'product') {
+    ppFromPage = fromPage || 'gallery';
+    document.getElementById('productBackBtn').onclick = () => showPage(ppFromPage);
+  }
+
   window.scrollTo(0,0);
 }
 
-// COOKIE CONSENT
-function cookieChoice(accepted) {
-  localStorage.setItem('cookieConsent', accepted ? 'accepted' : 'declined');
-  document.getElementById('cookieBanner').classList.remove('show');
+// ============================================================
+// MOBILE MENU
+// ============================================================
+function toggleMobileMenu() {
+  document.getElementById('mobileMenu').classList.toggle('open');
 }
-function initCookieBanner() {
-  const consent = localStorage.getItem('cookieConsent');
-  if(!consent) {
-    setTimeout(()=>document.getElementById('cookieBanner').classList.add('show'), 800);
-  }
+function closeMobileMenu() {
+  document.getElementById('mobileMenu').classList.remove('open');
 }
-initCookieBanner();
 
+// ============================================================
+// HERO SLIDESHOW
+// ============================================================
+function renderHeroSlideshow() {
+  const track = document.getElementById('heroSlidesTrack');
+  const dots = document.getElementById('heroDots');
+  const nav = document.getElementById('heroNav');
+
+  if(!heroImages.length) {
+    track.innerHTML = '';
+    dots.innerHTML = '';
+    nav.style.display = 'none';
+    return;
+  }
+
+  nav.style.display = heroImages.length > 1 ? 'flex' : 'none';
+  track.innerHTML = heroImages.map(src =>
+    `<div class="hero-slide"><img class="hero-slide-img" src="${src}" alt="Hero slide" loading="lazy"></div>`
+  ).join('');
+  dots.innerHTML = heroImages.map((_,i) =>
+    `<button class="hero-dot${i===heroIdx?' active':''}" onclick="heroGoTo(${i})"></button>`
+  ).join('');
+  updateHeroPosition();
+  startHeroTimer();
+}
+
+function updateHeroPosition() {
+  const track = document.getElementById('heroSlidesTrack');
+  track.style.transform = `translateX(-${heroIdx * 100}%)`;
+  document.querySelectorAll('.hero-dot').forEach((d,i) => d.classList.toggle('active', i===heroIdx));
+}
+
+function heroSlide(dir) {
+  heroIdx = (heroIdx + dir + heroImages.length) % heroImages.length;
+  updateHeroPosition();
+  resetHeroTimer();
+}
+
+function heroGoTo(i) {
+  heroIdx = i;
+  updateHeroPosition();
+  resetHeroTimer();
+}
+
+function startHeroTimer() {
+  clearInterval(heroTimer);
+  if(heroImages.length > 1) heroTimer = setInterval(() => heroSlide(1), 5000);
+}
+
+function resetHeroTimer() { startHeroTimer(); }
+
+// ============================================================
+// HERO ADMIN UPLOAD
+// ============================================================
+function handleHeroUpload(e) {
+  const files = Array.from(e.target.files);
+  let loaded = 0;
+  files.forEach(file => {
+    if(heroImages.length >= 10) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      heroImages.push(ev.target.result);
+      loaded++;
+      if(loaded === files.length) {
+        saveHeroImages();
+        renderHeroSlidesAdmin();
+        renderHeroSlideshow();
+        showToast('Hero photos updated!', 'success');
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value = '';
+}
+
+function renderHeroSlidesAdmin() {
+  const wrap = document.getElementById('heroSlidesAdmin');
+  wrap.innerHTML = heroImages.map((src,i) => `
+    <div class="hero-slide-admin">
+      <img src="${src}" alt="Slide ${i+1}">
+      <button class="hero-slide-del" onclick="deleteHeroSlide(${i})">✕</button>
+    </div>`).join('');
+}
+
+function deleteHeroSlide(i) {
+  heroImages.splice(i,1);
+  if(heroIdx >= heroImages.length) heroIdx = Math.max(0, heroImages.length-1);
+  saveHeroImages();
+  renderHeroSlidesAdmin();
+  renderHeroSlideshow();
+  showToast('Photo removed','success');
+}
+
+// ============================================================
+// PRODUCTS RENDER (SHOP)
+// ============================================================
 function renderProducts() {
-  const search = (document.getElementById('searchInput')?.value||'').toLowerCase();
-  const active = document.querySelector('#filterBar .filter-btn.active')?.dataset.cat||'All';
+  const search = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const active = document.querySelector('#filterBar .filter-btn.active')?.dataset.cat || 'All';
   const fb = document.getElementById('filterBar');
-  fb.innerHTML = CATEGORIES.map(c=>`<button class="filter-btn ${c===active?'active':''}" data-cat="${c}" onclick="setFilter('${c}','filterBar')">${c}</button>`).join('');
-  let filtered = products.filter(p=>{
-    const matchCat = active==='All'||p.cat===active;
-    const matchSearch = !search||p.name.toLowerCase().includes(search)||p.desc.toLowerCase().includes(search)||p.cat.toLowerCase().includes(search);
+  fb.innerHTML = CATEGORIES.map(c =>
+    `<button class="filter-btn ${c===active?'active':''}" data-cat="${c}" onclick="setFilter('${c}','filterBar')">${c}</button>`
+  ).join('');
+  let filtered = products.filter(p => {
+    const matchCat = active==='All' || p.cat===active;
+    const matchSearch = !search || p.name.toLowerCase().includes(search) || p.desc.toLowerCase().includes(search) || p.cat.toLowerCase().includes(search);
     return matchCat && matchSearch;
   });
   const grid = document.getElementById('productGrid');
-  if(!filtered.length){grid.innerHTML='<div class="no-products">No parts found. Try a different search or filter.</div>';return;}
-  grid.innerHTML = filtered.map(p=>`
-    <div class="product-card">
-      <div class="product-img">${p.emoji||'🔧'}</div>
-      <div class="product-info">
-        <div class="product-cat">${p.cat}</div>
-        <div class="product-name">${p.name}</div>
-        <div class="product-desc">${p.desc}</div>
-        <div class="product-footer">
-          <div class="product-price">$${parseFloat(p.price).toFixed(2)}</div>
-          ${p.stock==='in'?`<button class="add-cart-btn" onclick="addToCart(${p.id})">Add to Cart</button>`:`<span style="font-size:12px;color:var(--gray)">Out of Stock</span>`}
-        </div>
-      </div>
-    </div>`).join('');
+  if(!filtered.length) { grid.innerHTML = '<div class="no-products">No parts found.</div>'; return; }
+  grid.innerHTML = filtered.map(p => buildProductCard(p, 'shop')).join('');
+  initCardSliders('shop');
 }
 
+// ============================================================
+// GALLERY RENDER
+// ============================================================
 function renderGallery() {
-  const active = document.querySelector('#galleryFilterBar .filter-btn.active')?.dataset.cat||'All';
+  const active = document.querySelector('#galleryFilterBar .filter-btn.active')?.dataset.cat || 'All';
   const gb = document.getElementById('galleryFilterBar');
-  gb.innerHTML = CATEGORIES.map(c=>`<button class="filter-btn ${c===active?'active':''}" data-cat="${c}" onclick="setFilter('${c}','galleryFilterBar')">${c}</button>`).join('');
-  let filtered = active==='All'?products:products.filter(p=>p.cat===active);
+  gb.innerHTML = CATEGORIES.map(c =>
+    `<button class="filter-btn ${c===active?'active':''}" data-cat="${c}" onclick="setFilter('${c}','galleryFilterBar')">${c}</button>`
+  ).join('');
+  let filtered = active==='All' ? products : products.filter(p => p.cat===active);
   const grid = document.getElementById('galleryGrid');
-  if(!filtered.length){grid.innerHTML='<div class="no-products">No products in this category yet.</div>';return;}
-  grid.innerHTML = filtered.map(p=>`
-    <div class="product-card">
-      <div class="product-img" style="height:240px;font-size:80px">${p.emoji||'🔧'}</div>
+  if(!filtered.length) { grid.innerHTML = '<div class="no-products">No products in this category yet.</div>'; return; }
+  grid.innerHTML = filtered.map(p => buildProductCard(p, 'gallery')).join('');
+  initCardSliders('gallery');
+}
+
+// ============================================================
+// PRODUCT CARD BUILDER (shared by shop & gallery)
+// ============================================================
+function buildProductCard(p, fromPage) {
+  const photos = p.photos || [];
+  const hasPhotos = photos.length > 0;
+  const cardId = `card-${fromPage}-${p.id}`;
+
+  let imgHtml = '';
+  if(hasPhotos) {
+    imgHtml = `
+      <div class="product-img-wrap" id="${cardId}-wrap">
+        ${photos.map((src,i) => `<img src="${src}" alt="${p.name}" style="display:${i===0?'block':'none'};width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0" data-idx="${i}">`).join('')}
+        ${photos.length > 1 ? `
+          <button class="gallery-arrow left" onclick="cardPhotoNav(event,'${cardId}',-1,${photos.length})">&#8249;</button>
+          <button class="gallery-arrow right" onclick="cardPhotoNav(event,'${cardId}',1,${photos.length})">&#8250;</button>
+          <div class="product-img-dots" id="${cardId}-dots">
+            ${photos.map((_,i)=>`<span class="product-img-dot${i===0?' active':''}" style="cursor:pointer" onclick="cardPhotoNav(event,'${cardId}',null,${photos.length},${i})"></span>`).join('')}
+          </div>` : ''}
+      </div>`;
+  } else {
+    imgHtml = `<div class="product-img-wrap"><div class="product-img-emoji">${p.emoji||'🔧'}</div></div>`;
+  }
+
+  return `
+    <div class="product-card" onclick="openProductPage(${p.id},'${fromPage}')">
+      ${imgHtml}
       <div class="product-info">
         <div class="product-cat">${p.cat}</div>
         <div class="product-name">${p.name}</div>
         <div class="product-desc">${p.desc}</div>
         <div class="product-footer">
           <div class="product-price">$${parseFloat(p.price).toFixed(2)}</div>
-          ${p.stock==='in'?`<button class="add-cart-btn" onclick="addToCart(${p.id})">Add to Cart</button>`:`<span style="font-size:12px;color:var(--gray)">Out of Stock</span>`}
+          ${p.stock==='in'
+            ? `<button class="add-cart-btn" onclick="event.stopPropagation();addToCart(${p.id})">Add to Cart</button>`
+            : `<span style="font-size:12px;color:var(--gray)">Out of Stock</span>`}
         </div>
       </div>
-    </div>`).join('');
+    </div>`;
 }
 
-function setFilter(cat,barId) {
-  document.querySelectorAll('#'+barId+' .filter-btn').forEach(b=>b.classList.remove('active'));
+// ============================================================
+// CARD PHOTO NAVIGATION (gallery mini arrows)
+// ============================================================
+function initCardSliders(prefix) {
+  // nothing to init — state tracked by DOM
+}
+
+function cardPhotoNav(e, cardId, dir, total, goTo) {
+  e.stopPropagation();
+  const wrap = document.getElementById(cardId + '-wrap');
+  if(!wrap) return;
+  const imgs = wrap.querySelectorAll('img');
+  const dots = document.querySelectorAll(`#${cardId}-dots .product-img-dot`);
+
+  // Find current visible
+  let cur = 0;
+  imgs.forEach((img,i) => { if(img.style.display !== 'none') cur = i; });
+
+  let next;
+  if(goTo !== undefined) next = goTo;
+  else next = (cur + dir + total) % total;
+
+  imgs.forEach((img,i) => img.style.display = i===next ? 'block' : 'none');
+  dots.forEach((d,i) => d.classList.toggle('active', i===next));
+}
+
+// ============================================================
+// PRODUCT PAGE
+// ============================================================
+function openProductPage(id, fromPage) {
+  const p = products.find(x => x.id === id);
+  if(!p) return;
+  ppProduct = p;
+  ppIdx = 0;
+  ppFromPage = fromPage || 'gallery';
+
+  document.getElementById('ppCat').textContent = p.cat;
+  document.getElementById('ppName').textContent = p.name;
+  document.getElementById('ppPrice').textContent = `$${parseFloat(p.price).toFixed(2)}`;
+  const stockEl = document.getElementById('ppStock');
+  stockEl.textContent = p.stock === 'in' ? '● In Stock' : '● Out of Stock';
+  stockEl.className = `pp-stock ${p.stock === 'in' ? 'in' : 'out'}`;
+  document.getElementById('ppDesc').textContent = p.desc;
+  const addBtn = document.getElementById('ppAddBtn');
+  addBtn.disabled = p.stock !== 'in';
+  addBtn.textContent = p.stock === 'in' ? 'Add to Cart' : 'Out of Stock';
+
+  renderProductSlideshow(p);
+  showPage('product', fromPage);
+}
+
+function renderProductSlideshow(p) {
+  const photos = p.photos || [];
+  const track = document.getElementById('ppTrack');
+  const dots = document.getElementById('ppDots');
+  const thumbs = document.getElementById('ppThumbs');
+  const arrowL = document.getElementById('ppArrowL');
+  const arrowR = document.getElementById('ppArrowR');
+
+  if(photos.length === 0) {
+    track.innerHTML = `<div class="product-slideshow-slide"><div class="product-slideshow-emoji">${p.emoji||'🔧'}</div></div>`;
+    dots.innerHTML = '';
+    thumbs.innerHTML = '';
+    arrowL.style.display = arrowR.style.display = 'none';
+    return;
+  }
+
+  track.innerHTML = photos.map(src =>
+    `<div class="product-slideshow-slide"><img src="${src}" alt="${p.name}"></div>`
+  ).join('');
+
+  dots.innerHTML = photos.map((_,i) =>
+    `<button class="ps-dot${i===0?' active':''}" onclick="ppGoTo(${i})"></button>`
+  ).join('');
+
+  thumbs.innerHTML = photos.map((src,i) =>
+    `<div class="ps-thumb${i===0?' active':''}" onclick="ppGoTo(${i})"><img src="${src}" alt="thumb ${i+1}"></div>`
+  ).join('');
+
+  arrowL.style.display = arrowR.style.display = photos.length > 1 ? 'flex' : 'none';
+  ppIdx = 0;
+  updatePPSlideshow();
+}
+
+function updatePPSlideshow() {
+  const track = document.getElementById('ppTrack');
+  track.style.transform = `translateX(-${ppIdx * 100}%)`;
+  document.querySelectorAll('#ppDots .ps-dot').forEach((d,i) => d.classList.toggle('active', i===ppIdx));
+  document.querySelectorAll('#ppThumbs .ps-thumb').forEach((t,i) => t.classList.toggle('active', i===ppIdx));
+}
+
+function ppSlide(dir) {
+  const total = (ppProduct?.photos||[]).length || 1;
+  ppIdx = (ppIdx + dir + total) % total;
+  updatePPSlideshow();
+}
+
+function ppGoTo(i) {
+  ppIdx = i;
+  updatePPSlideshow();
+}
+
+function ppAddToCart() {
+  if(ppProduct) addToCart(ppProduct.id);
+}
+
+// ============================================================
+// FILTER
+// ============================================================
+function setFilter(cat, barId) {
+  document.querySelectorAll('#'+barId+' .filter-btn').forEach(b => b.classList.remove('active'));
   document.querySelector(`#${barId} [data-cat="${cat}"]`)?.classList.add('active');
   if(barId==='filterBar') renderProducts();
-
-// Show admin page when accessed via raresautoexp.com/admin
   else renderGallery();
 }
 
+// ============================================================
+// CART
+// ============================================================
 function addToCart(id) {
-  const p = products.find(x=>x.id===id);
-  if(!p||p.stock!=='in') return;
-  const existing = cart.find(x=>x.id===id);
+  const p = products.find(x => x.id===id);
+  if(!p || p.stock!=='in') return;
+  const existing = cart.find(x => x.id===id);
   if(existing) existing.qty++;
   else cart.push({...p, qty:1});
   updateCartUI();
-  showToast(`${p.name} added to cart!`,'success');
+  showToast(`${p.name} added to cart!`, 'success');
 }
 
 function updateCartUI() {
-  const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
-  document.getElementById('cartCount').textContent = cart.reduce((s,i)=>s+i.qty,0);
-  document.getElementById('cartTotal').textContent = '$'+total.toFixed(2);
+  const total = cart.reduce((s,i) => s + i.price*i.qty, 0);
+  document.getElementById('cartCount').textContent = cart.reduce((s,i) => s+i.qty, 0);
+  document.getElementById('cartTotal').textContent = '$' + total.toFixed(2);
   const items = document.getElementById('cartItems');
-  if(!cart.length){items.innerHTML='<div class="empty-cart"><div class="icon">🛒</div><p>Your cart is empty</p></div>';return;}
-  items.innerHTML = cart.map(i=>`
-    <div class="cart-item">
-      <div class="cart-item-emoji">${i.emoji||'🔧'}</div>
-      <div class="cart-item-info">
-        <div class="cart-item-name">${i.name}</div>
-        <div class="cart-item-price">$${(i.price*i.qty).toFixed(2)}</div>
-        <div class="cart-item-qty">
-          <button class="qty-btn" onclick="changeQty(${i.id},-1)">−</button>
-          <span style="font-size:14px;font-weight:600">${i.qty}</span>
-          <button class="qty-btn" onclick="changeQty(${i.id},1)">+</button>
+  if(!cart.length) {
+    items.innerHTML = '<div class="empty-cart"><div class="icon">🛒</div><p>Your cart is empty</p></div>';
+    return;
+  }
+  items.innerHTML = cart.map(i => {
+    const thumb = (i.photos&&i.photos.length)
+      ? `<div class="cart-item-thumb"><img src="${i.photos[0]}" alt="${i.name}"></div>`
+      : `<div class="cart-item-thumb">${i.emoji||'🔧'}</div>`;
+    return `
+      <div class="cart-item">
+        ${thumb}
+        <div class="cart-item-info">
+          <div class="cart-item-name">${i.name}</div>
+          <div class="cart-item-price">$${(i.price*i.qty).toFixed(2)}</div>
+          <div class="cart-item-qty">
+            <button class="qty-btn" onclick="changeQty(${i.id},-1)">−</button>
+            <span style="font-size:14px;font-weight:600">${i.qty}</span>
+            <button class="qty-btn" onclick="changeQty(${i.id},1)">+</button>
+          </div>
         </div>
-      </div>
-      <button class="cart-item-remove" onclick="removeFromCart(${i.id})">✕</button>
-    </div>`).join('');
+        <button class="cart-item-remove" onclick="removeFromCart(${i.id})">✕</button>
+      </div>`;
+  }).join('');
 }
 
 function changeQty(id,d){const i=cart.find(x=>x.id===id);if(!i)return;i.qty+=d;if(i.qty<=0)removeFromCart(id);else updateCartUI();}
@@ -859,13 +1223,17 @@ function removeFromCart(id){cart=cart.filter(x=>x.id!==id);updateCartUI();}
 function toggleCart(){document.getElementById('cartOverlay').classList.toggle('open');document.getElementById('cartPanel').classList.toggle('open');}
 function goCheckout(){if(!cart.length){showToast('Cart is empty','error');return;}toggleCart();showPage('checkout');}
 
+// ============================================================
+// CHECKOUT
+// ============================================================
 async function renderCheckout() {
   const lines = document.getElementById('checkoutLines');
-  const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
-  lines.innerHTML = cart.map(i=>`<div class="order-line"><span>${i.name} ×${i.qty}</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>`).join('') +
-    `<div class="order-line"><span>Total</span><span style="color:var(--red)">$${total.toFixed(2)}</span></div>`;
+  const total = cart.reduce((s,i) => s+i.price*i.qty, 0);
+  lines.innerHTML = cart.map(i =>
+    `<div class="order-line"><span>${i.name} ×${i.qty}</span><span>$${(i.price*i.qty).toFixed(2)}</span></div>`
+  ).join('') + `<div class="order-line"><span>Total</span><span style="color:var(--red)">$${total.toFixed(2)}</span></div>`;
+
   const mount = document.getElementById('stripeCardMount');
-  // Fetch publishable key from backend if BACKEND_URL is set
   let pk = stripeKeys.pk;
   if(BACKEND_URL && !pk) {
     try {
@@ -873,7 +1241,7 @@ async function renderCheckout() {
       const cfg = await res.json();
       pk = cfg.publishableKey;
       if(pk) { stripeKeys.pk = pk; localStorage.setItem('acStripe', JSON.stringify(stripeKeys)); }
-    } catch(e) { console.warn('Could not fetch Stripe config from backend'); }
+    } catch(e) { console.warn('Could not fetch Stripe config'); }
   }
   if(pk) {
     try {
@@ -884,7 +1252,7 @@ async function renderCheckout() {
       card.mount('#cardEl');
       window._stripeCard = card;
       window._stripe = stripe;
-    } catch(e){ mount.innerHTML='<p style="font-size:13px;color:var(--gray)">⚠️ Invalid Stripe key or backend not connected.</p>'; }
+    } catch(e){ mount.innerHTML='<p style="font-size:13px;color:var(--gray)">⚠️ Invalid Stripe key.</p>'; }
   } else {
     mount.innerHTML = '<div style="background:rgba(208,37,26,0.08);border:1px dashed rgba(208,37,26,0.4);border-radius:6px;padding:14px 16px;font-size:13px;color:var(--gray)">💳 Card element will appear here once your backend URL is saved in Admin → Stripe Settings</div>';
   }
@@ -895,27 +1263,23 @@ async function handleCheckout() {
   const email = document.getElementById('chkEmail').value.trim();
   if(!name||!email){showToast('Please fill in your name and email','error');return;}
   if(!BACKEND_URL){showToast('Backend URL not set. Go to Admin → Stripe Settings','error');return;}
-  if(!window._stripe||!window._stripeCard){showToast('Payment form not ready. Please wait...','error');return;}
+  if(!window._stripe||!window._stripeCard){showToast('Payment form not ready.','error');return;}
   const btn = document.getElementById('payBtn');
-  btn.textContent = 'Processing...';
-  btn.disabled = true;
+  btn.textContent = 'Processing...'; btn.disabled = true;
   try {
-    const total = cart.reduce((s,i)=>s+i.price*i.qty,0);
-    // Step 1: Create PaymentIntent on our backend
+    const total = cart.reduce((s,i) => s+i.price*i.qty, 0);
     const intentRes = await fetch(BACKEND_URL+'/create-payment-intent', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({amount: total, currency:'usd', customerEmail:email, customerName:name, items:cart})
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({amount:total,currency:'usd',customerEmail:email,customerName:name,items:cart})
     });
     const intentData = await intentRes.json();
     if(intentData.error){showToast('Server error: '+intentData.error,'error');btn.textContent='PAY NOW';btn.disabled=false;return;}
-    // Step 2: Confirm payment with Stripe
-    const {error, paymentIntent} = await window._stripe.confirmCardPayment(intentData.clientSecret, {
-      payment_method: { card: window._stripeCard, billing_details: {name, email} }
+    const {error,paymentIntent} = await window._stripe.confirmCardPayment(intentData.clientSecret, {
+      payment_method:{card:window._stripeCard,billing_details:{name,email}}
     });
     if(error){showToast(error.message,'error');btn.textContent='PAY NOW';btn.disabled=false;return;}
-    if(paymentIntent.status==='succeeded') {
-      showToast('Payment successful! Thank you for your order.','success');
+    if(paymentIntent.status==='succeeded'){
+      showToast('Payment successful! Thank you.','success');
       cart=[];updateCartUI();
       setTimeout(()=>showPage('shop'),3000);
     }
@@ -923,7 +1287,9 @@ async function handleCheckout() {
   btn.textContent='PAY NOW';btn.disabled=false;
 }
 
-// ADMIN
+// ============================================================
+// ADMIN AUTH
+// ============================================================
 function doLogin(){
   const u=document.getElementById('adminUser').value;
   const p=document.getElementById('adminPass').value;
@@ -935,14 +1301,17 @@ function doLogin(){
 }
 function doLogout(){document.getElementById('adminLogin').style.display='block';document.getElementById('adminDashboard').style.display='none';}
 
+// ============================================================
+// ADMIN TABS
+// ============================================================
 function showAdminTab(tab, el) {
-  document.querySelectorAll('[id^="tab-"]').forEach(x=>x.style.display='none');
+  document.querySelectorAll('[id^="tab-"]').forEach(x => x.style.display='none');
   document.getElementById('tab-'+tab).style.display='block';
-  document.querySelectorAll('.sidebar-item').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(x => x.classList.remove('active'));
   el.classList.add('active');
-  currentAdminTab=tab;
   if(tab==='dashboard'){renderAdminStats();renderDashRecent();}
   if(tab==='products'){renderAdminTable();}
+  if(tab==='hero'){renderHeroSlidesAdmin();}
   if(tab==='stripe'){loadStripeUI();}
 }
 
@@ -959,26 +1328,43 @@ function renderAdminStats(){
 function renderDashRecent(){
   const recent=products.slice(-5).reverse();
   document.getElementById('dashRecentTable').innerHTML=recent.map(p=>`
-    <tr><td class="td-emoji">${p.emoji||'🔧'}</td><td>${p.name}</td><td><span class="td-cat">${p.cat}</span></td><td class="td-price">$${parseFloat(p.price).toFixed(2)}</td>
-    <td><span class="product-stock ${p.stock==='in'?'in-stock':'out-stock'}">${p.stock==='in'?'In Stock':'Out of Stock'}</span></td></tr>`).join('');
+    <tr>
+      <td><div class="td-thumb">${(p.photos&&p.photos.length)?`<img src="${p.photos[0]}" alt="${p.name}">`:p.emoji||'🔧'}</div></td>
+      <td>${p.name}</td>
+      <td><span class="td-cat">${p.cat}</span></td>
+      <td class="td-price">$${parseFloat(p.price).toFixed(2)}</td>
+      <td><span class="product-stock ${p.stock==='in'?'in-stock':'out-stock'}">${p.stock==='in'?'In Stock':'Out of Stock'}</span></td>
+    </tr>`).join('');
 }
 
 function renderAdminTable(){
   const search=(document.getElementById('adminSearch')?.value||'').toLowerCase();
   let filtered=products.filter(p=>!search||p.name.toLowerCase().includes(search)||p.cat.toLowerCase().includes(search));
   document.getElementById('adminProductTable').innerHTML=filtered.map(p=>`
-    <tr><td class="td-emoji">${p.emoji||'🔧'}</td><td style="font-weight:500">${p.name}</td>
-    <td><span class="td-cat">${p.cat}</span></td><td class="td-price">$${parseFloat(p.price).toFixed(2)}</td>
-    <td><span class="product-stock ${p.stock==='in'?'in-stock':'out-stock'}">${p.stock==='in'?'In Stock':'Out of Stock'}</span></td>
-    <td><div class="action-btns"><button class="btn-edit" onclick="openProductModal(${p.id})">Edit</button><button class="btn-delete" onclick="deleteProduct(${p.id})">Delete</button></div></td></tr>`).join('');
+    <tr>
+      <td><div class="td-thumb">${(p.photos&&p.photos.length)?`<img src="${p.photos[0]}" alt="${p.name}">`:p.emoji||'🔧'}</div></td>
+      <td style="font-weight:500">${p.name}</td>
+      <td><span class="td-cat">${p.cat}</span></td>
+      <td class="td-price">$${parseFloat(p.price).toFixed(2)}</td>
+      <td><span class="product-stock ${p.stock==='in'?'in-stock':'out-stock'}">${p.stock==='in'?'In Stock':'Out of Stock'}</span></td>
+      <td><div class="action-btns">
+        <button class="btn-edit" onclick="openProductModal(${p.id})">Edit</button>
+        <button class="btn-delete" onclick="deleteProduct(${p.id})">Delete</button>
+      </div></td>
+    </tr>`).join('');
   renderAdminStats();
 }
 
+// ============================================================
+// PRODUCT MODAL
+// ============================================================
 function openProductModal(id=null){
   editId=id;
+  modalPhotos=[];
   const modal=document.getElementById('productModal');
   const picker=document.getElementById('emojiPicker');
   picker.innerHTML=EMOJIS.map(e=>`<span class="emoji-opt${selectedEmoji===e?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
+
   if(id){
     const p=products.find(x=>x.id===id);
     if(!p)return;
@@ -989,13 +1375,54 @@ function openProductModal(id=null){
     document.getElementById('pPrice').value=p.price;
     document.getElementById('pStock').value=p.stock;
     selectedEmoji=p.emoji||'🔧';
-    picker.innerHTML=EMOJIS.map(e=>`<span class="emoji-opt${selectedEmoji===e?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
+    modalPhotos=[...(p.photos||[])];
   } else {
     document.getElementById('modalTitle').textContent='ADD PRODUCT';
-    document.getElementById('pName').value='';document.getElementById('pCat').value='Brakes';document.getElementById('pDesc').value='';document.getElementById('pPrice').value='';document.getElementById('pStock').value='in';
+    document.getElementById('pName').value='';
+    document.getElementById('pCat').value='Brakes';
+    document.getElementById('pDesc').value='';
+    document.getElementById('pPrice').value='';
+    document.getElementById('pStock').value='in';
     selectedEmoji='🔧';
+    modalPhotos=[];
   }
+  renderModalPhotos();
+  picker.innerHTML=EMOJIS.map(e=>`<span class="emoji-opt${selectedEmoji===e?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
   modal.classList.add('open');
+}
+
+function renderModalPhotos(){
+  const grid=document.getElementById('photoUploadGrid');
+  let html=modalPhotos.map((src,i)=>`
+    <div class="photo-thumb-wrap">
+      <img src="${src}" alt="photo ${i+1}">
+      <button class="photo-thumb-del" onclick="removeModalPhoto(${i})">✕</button>
+    </div>`).join('');
+  if(modalPhotos.length < 5){
+    html+=`<button class="photo-add-btn" onclick="document.getElementById('photoFileInput').click()" title="Add photo">+</button>`;
+  }
+  grid.innerHTML=html;
+}
+
+function handleProductPhotoUpload(e){
+  const files=Array.from(e.target.files);
+  let loaded=0;
+  files.forEach(file=>{
+    if(modalPhotos.length>=5)return;
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      modalPhotos.push(ev.target.result);
+      loaded++;
+      if(loaded===files.length){ renderModalPhotos(); }
+    };
+    reader.readAsDataURL(file);
+  });
+  e.target.value='';
+}
+
+function removeModalPhoto(i){
+  modalPhotos.splice(i,1);
+  renderModalPhotos();
 }
 
 function selectEmoji(e){selectedEmoji=e;document.querySelectorAll('.emoji-opt').forEach(x=>x.classList.toggle('selected',x.textContent===e));}
@@ -1005,7 +1432,15 @@ function saveProduct(){
   const name=document.getElementById('pName').value.trim();
   const price=parseFloat(document.getElementById('pPrice').value);
   if(!name||isNaN(price)||price<0){showToast('Please fill all required fields','error');return;}
-  const product={name,cat:document.getElementById('pCat').value,desc:document.getElementById('pDesc').value,price,emoji:selectedEmoji,stock:document.getElementById('pStock').value};
+  const product={
+    name,
+    cat:document.getElementById('pCat').value,
+    desc:document.getElementById('pDesc').value,
+    price,
+    emoji:selectedEmoji,
+    stock:document.getElementById('pStock').value,
+    photos:[...modalPhotos]
+  };
   if(editId){
     const idx=products.findIndex(x=>x.id===editId);
     products[idx]={...product,id:editId};
@@ -1025,6 +1460,9 @@ function deleteProduct(id){
   showToast('Product deleted','success');
 }
 
+// ============================================================
+// STRIPE ADMIN
+// ============================================================
 function loadStripeUI(){
   document.getElementById('stripePkInput').value=stripeKeys.pk||'';
   document.getElementById('stripeSkInput').value=stripeKeys.sk||'';
@@ -1040,16 +1478,37 @@ function saveStripeKeys(){
   loadStripeUI();showToast('Settings saved!','success');
 }
 
+// ============================================================
+// COOKIE
+// ============================================================
+function cookieChoice(accepted){
+  localStorage.setItem('cookieConsent',accepted?'accepted':'declined');
+  document.getElementById('cookieBanner').classList.remove('show');
+}
+function initCookieBanner(){
+  if(!localStorage.getItem('cookieConsent')){
+    setTimeout(()=>document.getElementById('cookieBanner').classList.add('show'),800);
+  }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
 function showToast(msg,type='success'){
   const t=document.getElementById('toast');
   t.textContent=msg;t.className='toast show '+type;
   setTimeout(()=>t.className='toast',3200);
 }
 
+// ============================================================
+// INIT
+// ============================================================
 renderProducts();
+renderHeroSlideshow();
+initCookieBanner();
 
-// Show admin page when accessed via raresautoexp.com/admin
-if (window.location.pathname === '/admin') showPage('admin');
+// Route to admin if URL is /admin
+if(window.location.pathname==='/admin') showPage('admin');
 </script>
 </body>
 </html>
