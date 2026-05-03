@@ -1451,7 +1451,7 @@ function removeModalPhoto(i){
 function selectEmoji(e){selectedEmoji=e;document.querySelectorAll('.emoji-opt').forEach(x=>x.classList.toggle('selected',x.textContent===e));}
 function closeModal(){document.getElementById('productModal').classList.remove('open');}
 
-function saveProduct(){
+function saveProduct(andReturn){
   const name=document.getElementById('pName').value.trim();
   const price=parseFloat(document.getElementById('pPrice').value);
   if(!name||isNaN(price)||price<0){showToast('Please fill all required fields','error');return false;}
@@ -1473,17 +1473,20 @@ function saveProduct(){
     products.push(product);
     showToast('Product added!','success');
   }
-  saveProducts();closeModal();renderAdminTable();renderDashRecent();
+  saveProducts();
+  renderAdminTable();
+  renderDashRecent();
+  closeModal();
+  if(andReturn){
+    const productsTabBtn = Array.from(document.querySelectorAll('.sidebar-item'))
+      .find(el => el.getAttribute('onclick') && el.getAttribute('onclick').includes("'products'"));
+    if(productsTabBtn) showAdminTab('products', productsTabBtn);
+  }
   return true;
 }
 
 function saveProductAndReturn(){
-  const saved = saveProduct();
-  if(!saved) return;
-  // Navigate to the Products tab
-  const productsTabBtn = Array.from(document.querySelectorAll('.sidebar-item'))
-    .find(el => el.textContent.trim().startsWith('Products') || el.textContent.includes('Products'));
-  if(productsTabBtn) showAdminTab('products', productsTabBtn);
+  saveProduct(true);
 }
 
 function deleteProduct(id){
