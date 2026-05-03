@@ -810,13 +810,78 @@ const EMOJIS = ['🔧','⚙️','🛞','💡','🔩','🪛','🔌','🛢️','�
 const CATEGORIES = ['All','Brakes','Engine','Suspension','Electrical','Filters','Exhaust','Lighting','Transmission','Cooling','Body'];
 
 let products = JSON.parse(localStorage.getItem('acProducts') || '[]');
-let heroImages = JSON.parse(localStorage.getItem('acHeroImages') || '[]'); // array of base64 strings
+let heroImages = JSON.parse(localStorage.getItem('acHeroImages') || '[]');
 let cart = [];
 let editId = null;
 let selectedEmoji = '🔧';
 let modalPhotos = []; // base64 photos being edited in modal
 let BACKEND_URL = localStorage.getItem('acBackendUrl') || '';
 let stripeKeys = JSON.parse(localStorage.getItem('acStripe') || '{}');
+
+// ============================================================
+// INDEXEDDB — unlimited photo storage
+// ============================================================
+let photoDB = null;
+
+function openPhotoDB(){
+  return new Promise((resolve, reject) => {
+    if(photoDB){ resolve(photoDB); return; }
+    const req = indexedDB.open('raresPhotos', 1);
+    req.onupgradeneeded = e => {
+      e.target.result.createObjectStore('photos', { keyPath: 'key' });
+    };
+    req.onsuccess = e => { photoDB = e.target.result; resolve(photoDB); };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbSavePhotos(productId, photosArr){
+  return openPhotoDB().then(db => new Promise((resolve, reject) => {
+    const tx = db.transaction('photos', 'readwrite');
+    const store = tx.objectStore('photos');
+    store.put({ key: 'product_' + productId, photos: photosArr });
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  }));
+}
+
+function dbGetPhotos(productId){
+  return openPhotoDB().then(db => new Promise((resolve) => {
+    const req = db.transaction('photos', 'readonly')
+                  .objectStore('photos')
+                  .get('product_' + productId);
+    req.onsuccess = () => resolve(req.result ? req.result.photos : []);
+    req.onerror = () => resolve([]);
+  }));
+}
+
+function dbDeletePhotos(productId){
+  return openPhotoDB().then(db => new Promise((resolve) => {
+    const tx = db.transaction('photos', 'readwrite');
+    tx.objectStore('photos').delete('product_' + productId);
+    tx.oncomplete = resolve;
+    tx.onerror = resolve;
+  }));
+}
+
+// Load photos from IndexedDB into each product object, then re-render
+function loadAllPhotosAndRender(){
+  if(!products.length){ renderProducts(); renderGallery(); return; }
+  let done = 0;
+  products.forEach(p => {
+    dbGetPhotos(p.id).then(photos => {
+      p.photos = photos;
+      done++;
+      if(done === products.length){
+        renderProducts();
+        renderGallery();
+        renderAdminTable();
+        renderDashRecent();
+        renderHeroSlideshow();
+      }
+    });
+  });
+};
 
 // Hero slideshow state
 let heroIdx = 0;
@@ -847,14 +912,21 @@ if (products.length === 0) {
 
 function saveProducts() {
   try {
-    localStorage.setItem('acProducts', JSON.stringify(products));
+    // Only save metadata to localStorage — photos live in IndexedDB
+    const meta = products.map(p => {
+      const {photos, ...rest} = p;
+      return rest;
+    });
+    localStorage.setItem('acProducts', JSON.stringify(meta));
     return true;
   } catch(e) {
-    showToast('Storage full — photos too large. Try smaller images.','error');
+    showToast('Could not save product data.','error');
     return false;
   }
 }
-function saveHeroImages() { localStorage.setItem('acHeroImages', JSON.stringify(heroImages)); }
+function saveHeroImages() {
+  try { localStorage.setItem('acHeroImages', JSON.stringify(heroImages)); } catch(e) {}
+}
 
 // ============================================================
 // PAGE ROUTING
@@ -1394,7 +1466,6 @@ function openProductModal(id=null){
   modalPhotos=[];
   const modal=document.getElementById('productModal');
   const picker=document.getElementById('emojiPicker');
-  picker.innerHTML=EMOJIS.map(e=>`<span class="emoji-opt${selectedEmoji===e?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
 
   if(id){
     const p=products.find(x=>x.id===id);
@@ -1406,7 +1477,13 @@ function openProductModal(id=null){
     document.getElementById('pPrice').value=p.price;
     document.getElementById('pStock').value=p.stock;
     selectedEmoji=p.emoji||'🔧';
-    modalPhotos=[...(p.photos||[])];
+    picker.innerHTML=EMOJIS.map(e=>`<span class="emoji-opt${selectedEmoji===e?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
+    modal.classList.add('open');
+    // Load photos fresh from IndexedDB
+    dbGetPhotos(id).then(photos=>{
+      modalPhotos=photos||[];
+      renderModalPhotos();
+    });
   } else {
     document.getElementById('modalTitle').textContent='ADD PRODUCT';
     document.getElementById('pName').value='';
@@ -1416,10 +1493,10 @@ function openProductModal(id=null){
     document.getElementById('pStock').value='in';
     selectedEmoji='🔧';
     modalPhotos=[];
+    picker.innerHTML=EMOJIS.map(e=>`<span class="emoji-opt${selectedEmoji===e?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
+    renderModalPhotos();
+    modal.classList.add('open');
   }
-  renderModalPhotos();
-  picker.innerHTML=EMOJIS.map(e=>`<span class="emoji-opt${selectedEmoji===e?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
-  modal.classList.add('open');
 }
 
 function renderModalPhotos(){
@@ -1521,34 +1598,35 @@ function _doSaveProduct(andReturn, name, price, photos){
     price,
     emoji:selectedEmoji,
     stock:document.getElementById('pStock').value,
-    photos:photos
+    photos:photos  // kept in memory for rendering; not written to localStorage
   };
+  let productId;
   if(editId){
     const idx=products.findIndex(x=>x.id===editId);
     products[idx]={...product,id:editId};
+    productId=editId;
     showToast('Product updated!','success');
   } else {
     product.id=Date.now();
     products.push(product);
+    productId=product.id;
     showToast('Product added!','success');
   }
-  const ok=saveProducts();
-  if(!ok){
-    // Roll back the in-memory change
-    if(editId){ const idx=products.findIndex(x=>x.id===editId); if(idx>-1) products.splice(idx,1); }
-    else products.pop();
-    return;
-  }
-  closeModal();
-  renderAdminTable();
-  renderDashRecent();
-  if(andReturn){
-    setTimeout(function(){
-      const productsTabBtn=Array.from(document.querySelectorAll('.sidebar-item'))
-        .find(el=>el.getAttribute('onclick')&&el.getAttribute('onclick').includes("'products'"));
-      if(productsTabBtn) showAdminTab('products',productsTabBtn);
-    },50);
-  }
+  // Save metadata to localStorage (no photos)
+  saveProducts();
+  // Save photos to IndexedDB (no size limit)
+  dbSavePhotos(productId, photos).then(()=>{
+    closeModal();
+    renderAdminTable();
+    renderDashRecent();
+    if(andReturn){
+      setTimeout(function(){
+        const productsTabBtn=Array.from(document.querySelectorAll('.sidebar-item'))
+          .find(el=>el.getAttribute('onclick')&&el.getAttribute('onclick').includes("'products'"));
+        if(productsTabBtn) showAdminTab('products',productsTabBtn);
+      },50);
+    }
+  });
 }
 
 function saveProductAndReturn(){
@@ -1558,7 +1636,9 @@ function saveProductAndReturn(){
 function deleteProduct(id){
   if(!confirm('Delete this product?'))return;
   products=products.filter(x=>x.id!==id);
-  saveProducts();renderAdminTable();renderDashRecent();
+  saveProducts();
+  dbDeletePhotos(id);
+  renderAdminTable();renderDashRecent();
   showToast('Product deleted','success');
 }
 
@@ -1605,8 +1685,8 @@ function showToast(msg,type='success'){
 // ============================================================
 // INIT
 // ============================================================
-renderProducts();
-renderHeroSlideshow();
+// Load photos from IndexedDB into products array, then render everything
+loadAllPhotosAndRender();
 initCookieBanner();
 
 // Route to admin if URL is /admin
