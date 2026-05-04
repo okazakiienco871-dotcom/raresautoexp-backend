@@ -821,6 +821,25 @@ let modalPhotos = []; // objects: {url, isNew, file} or legacy base64 strings
 let BACKEND_URL = localStorage.getItem('acBackendUrl') || '';
 let stripeKeys = JSON.parse(localStorage.getItem('acStripe') || '{}');
 
+// ── Load Stripe settings from server ───────────────────────────
+async function loadSettingsFromAPI() {
+  try {
+    const res = await fetch(API + '/settings.php');
+    if (!res.ok) throw new Error('settings API error');
+    const data = await res.json();
+    if (data.backend_url) {
+      BACKEND_URL = data.backend_url;
+      localStorage.setItem('acBackendUrl', BACKEND_URL);
+    }
+    if (data.stripe_pk) {
+      stripeKeys.pk = data.stripe_pk;
+      localStorage.setItem('acStripe', JSON.stringify(stripeKeys));
+    }
+  } catch(e) {
+    console.warn('Could not load settings from server, using localStorage fallback', e);
+  }
+}
+
 // Hero slideshow state
 let heroIdx = 0;
 let heroTimer = null;
@@ -1622,12 +1641,25 @@ function loadStripeUI(){
   document.getElementById('stripeStatus').innerHTML=(BACKEND_URL&&stripeKeys.pk)?'<span class="badge-connected"><span class="badge-dot"></span>Connected</span>':'';
 }
 
-function saveStripeKeys(){
+async function saveStripeKeys(){
   stripeKeys={pk:document.getElementById('stripePkInput').value.trim(),sk:document.getElementById('stripeSkInput').value.trim()};
   BACKEND_URL=document.getElementById('backendUrlInput').value.trim().replace(/\/$/,'');
+  // Save to localStorage as fallback
   localStorage.setItem('acStripe',JSON.stringify(stripeKeys));
   localStorage.setItem('acBackendUrl',BACKEND_URL);
-  loadStripeUI();showToast('Settings saved!','success');
+  // Save to server so all browsers/devices pick it up automatically
+  try {
+    await fetch(API + '/settings.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ backend_url: BACKEND_URL, stripe_pk: stripeKeys.pk })
+    });
+    loadStripeUI();
+    showToast('Settings saved!','success');
+  } catch(e) {
+    loadStripeUI();
+    showToast('Saved locally but could not sync to server','error');
+  }
 }
 
 // ============================================================
@@ -1655,6 +1687,7 @@ function showToast(msg,type='success'){
 // ============================================================
 // INIT
 // ============================================================
+loadSettingsFromAPI(); // load Stripe settings from server first
 loadProductsFromAPI();
 loadHeroFromAPI();
 initCookieBanner();
