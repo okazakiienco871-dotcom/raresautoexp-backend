@@ -844,7 +844,9 @@ async function loadProductsFromAPI() {
     const data = await res.json();
     products = data.map(p => ({
       ...p,
-      desc: p.description || p.desc || '',
+      id:    parseInt(p.id),
+      price: parseFloat(p.price),
+      desc:  p.description || p.desc || '',
       photos: p.photos || []
     }));
   } catch(e) {
@@ -1136,7 +1138,7 @@ function cardPhotoNav(e, cardId, dir, total, goTo) {
 // PRODUCT PAGE
 // ============================================================
 function openProductPage(id, fromPage) {
-  const p = products.find(x => x.id === id);
+  const p = products.find(x => x.id == id);
   if(!p) return;
   ppProduct = p;
   ppIdx = 0;
@@ -1226,7 +1228,7 @@ function setFilter(cat, barId) {
 // CART
 // ============================================================
 function addToCart(id) {
-  const p = products.find(x => x.id===id);
+  const p = products.find(x => x.id==id);
   if(!p || p.stock!=='in') return;
   const existing = cart.find(x => x.id===id);
   if(existing) existing.qty++;
@@ -1432,7 +1434,7 @@ function openProductModal(id=null){
   picker.innerHTML=EMOJIS.map(e=>`<span class="emoji-opt${selectedEmoji===e?' selected':''}" onclick="selectEmoji('${e}')">${e}</span>`).join('');
 
   if(id){
-    const p=products.find(x=>x.id===id);
+    const p=products.find(x=>x.id==id);
     if(!p)return;
     document.getElementById('modalTitle').textContent='EDIT PRODUCT';
     document.getElementById('pName').value=p.name;
@@ -1558,14 +1560,20 @@ async function saveProduct(andReturn){
       saved = await res.json();
       if (!res.ok) throw new Error(saved.error || 'Update failed');
       const idx = products.findIndex(x=>x.id===editId);
-      saved.desc = saved.description || saved.desc || '';
+      saved.id    = parseInt(saved.id);
+      saved.price = parseFloat(saved.price);
+      saved.desc  = saved.description || saved.desc || '';
+      saved.photos = saved.photos || [];
       if (idx > -1) products[idx] = saved; else products.push(saved);
       showToast('Product updated!','success');
     } else {
       res   = await fetch(API + '/products.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(product) });
       saved = await res.json();
       if (!res.ok) throw new Error(saved.error || 'Create failed');
-      saved.desc = saved.description || saved.desc || '';
+      saved.id    = parseInt(saved.id);
+      saved.price = parseFloat(saved.price);
+      saved.desc  = saved.description || saved.desc || '';
+      saved.photos = saved.photos || [];
       products.unshift(saved);
       showToast('Product added!','success');
     }
